@@ -1,3 +1,4 @@
+import random
 
 class Card():
     def __init__(self, nome):
@@ -50,6 +51,14 @@ class Jogador():
     def separar(self):
         self.deck.separar()
         self.espaço_herois.extend(self.deck.herois)
+
+    def embaralhar_deck(self):
+        random.shuffle(self.deck.cartas)
+
+    def comprar_mão_inicial(self):
+        self.hand = self.deck.cartas[0:6]
+        self.deck.cartas = self.deck.cartas[6:]
+
 
 class Jogo():
     def __init__(self):
