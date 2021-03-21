@@ -38,10 +38,15 @@ def herois():
 @pytest.fixture
 def deck_de_missao():
     # http://hallofbeorn.com/LotR/Scenarios/A-Shadow-of-the-Past
+    texto = """
+    Setup: Set Buckleberry Ferry aside, out of play. Add 1 Black Rider to the
+    staging area and make Bag End the active location. Shuffle the encounter
+    deck.
+    """
     deck = lord.Deck()
-    deck.nova_carta(lord.Card('Three is Company'))
-    deck.nova_carta(lord.Card('A Shortcut to Mushrooms'))
-    deck.nova_carta(lord.Card('Escape to Buckland'))
+    deck.nova_carta(lord.Mission('Three is Company',texto))
+    deck.nova_carta(lord.Mission('A Shortcut to Mushrooms'))
+    deck.nova_carta(lord.Mission('Escape to Buckland'))
     return deck
 
 @pytest.fixture
@@ -52,6 +57,9 @@ def deck_de_encontro():
     deck.nova_carta(lord.Card('Woody End'))
     deck.nova_carta(lord.Card('Stock-Brook'))
     deck.nova_carta(lord.Card('Pathless Country'))
+    deck.nova_carta(lord.Card('Buckleberry Ferry'))
+    deck.nova_carta(lord.Card('Black Rider'))
+    deck.nova_carta(lord.Location('Bag End',0,3,vitoria = 1))
     return deck
 
 
@@ -122,8 +130,8 @@ def test_jogar_carta_custo_1(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.jogar('Snowbourn Scout')
     jogo.jogador1.pagar_de('Elfhelm', 1)
     assert len(jogo.jogador1.mão) == 6
-    assert len(jogo.jogador1.mesa) == 1
-    assert jogo.jogador1.mesa[0].virado == False
+    assert jogo.jogador1.mesa.total == 1
+    assert jogo.jogador1.mesa.cartas[0].virado == False
     assert jogo.jogador1.herois_em_jogo.cartas[0].recursos == 0
 
 def test_existe_cenario(jogo_com_um_jogador, deck_para_abertura,
@@ -134,3 +142,18 @@ def test_existe_cenario(jogo_com_um_jogador, deck_para_abertura,
     jogo.jogador1.comprar_mão_inicial()
     assert jogo.deck_de_missao.total > 0
     assert jogo.deck_de_encontro.total > 0
+
+def test_carta_fora_do_jogo(jogo_com_um_jogador, deck_para_abertura,
+    deck_de_missao, deck_de_encontro, herois):
+    jogo = jogo_com_um_jogador
+    jogo.escolher_cenario('A Shadow of the Past', deck_de_missao, deck_de_encontro)
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    jogo.mover_carta('Buckleberry Ferry',jogo.DECK_DE_ENCONTRO,jogo.FORA_DO_JOGO)
+    jogo.mover_carta('Black Rider',jogo.DECK_DE_ENCONTRO,jogo.AREA_DE_AMEACA)
+    jogo.mover_carta('Bag End',jogo.DECK_DE_ENCONTRO,jogo.LOCALIZACAO_ATIVA)
+    assert 'Set Buckleberry Ferry aside' in jogo.deck_de_missao.cartas[0].texto_frente
+    assert jogo.fora_do_jogo.total > 0
+    assert jogo.fora_do_jogo.cartas[0].nome == 'Buckleberry Ferry'
+    assert jogo.area_de_ameaca.total > 0
+    assert jogo.area_de_ameaca.cartas[0].nome == 'Black Rider'

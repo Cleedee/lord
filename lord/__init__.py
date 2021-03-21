@@ -22,6 +22,19 @@ class Hero(Card):
     def adicionar_recurso(self):
         self.recursos += 1
 
+class Mission(Card):
+    def __init__(self, nome, texto_frente = '', texto_verso = ''):
+        super().__init__(nome)
+        self.texto_frente = texto_frente
+        self.texto_verso = texto_verso
+
+class Location(Card):
+    def __init__(self, nome, força_ameaça, pontos_missao, vitoria = 0):
+        super().__init__(nome)
+        self.força_ameaça = força_ameaça
+        self.pontos_missao = pontos_missao
+        self.vitoria = vitoria
+
 class Deck():
     def __init__(self):
         self.cartas = []
@@ -32,6 +45,13 @@ class Deck():
 
     def nova_carta(self, carta):
         self.cartas.append(carta)
+
+    def retirar(self, nome_carta):
+        return next((self.cartas.pop(i) for i, l in enumerate(self.cartas) if l.nome == nome_carta), None)
+
+class Area(Deck):
+    def __init__(self):
+        super().__init__()
 
 class Mão(UserList):
     def index(self, valor):
@@ -50,8 +70,8 @@ class Jogador():
         self.hand = Mão()
         self.deck_de_compra = None
         self.deck_de_descarte = None
-        self.herois_em_jogo = None
-        self.mesa = []
+        self.herois_em_jogo = Area()
+        self.mesa = Area()
 
     def usar_decks(self, deck_de_herois, deck_de_jogador):
         self.deck_de_herois = deck_de_herois
@@ -91,7 +111,7 @@ class Jogador():
         carta = self.hand.pop(pos)
         if not carta:
             raise Exception
-        self.mesa.append( carta )
+        self.mesa.nova_carta( carta )
 
     def pagar_de(self, heroi, quantidade):
         for count, value in enumerate( self.herois_em_jogo.cartas):
@@ -101,11 +121,62 @@ class Jogador():
 
 
 class Jogo():
+    DECK_DE_ENCONTRO = 'DECK_DE_ENCONTRO'
+    DECK_DE_MISSAO = 'DECK_DE_MISSAO'
+    FORA_DO_JOGO = 'FORA_DO_JOGO'
+    AREA_DE_AMEACA = 'AREA_DE_AMEACA'
+    LOCALIZACAO_ATIVA = 'LOCALIZACAO_ATIVA'
+
     def __init__(self):
         self.jogadores = []
         self.nome_cenario = ''
-        self.deck_de_missao = None
-        self.deck_de_encontro = None
+        self.locais = {
+            Jogo.DECK_DE_ENCONTRO : Deck(),
+            Jogo.DECK_DE_MISSAO : Deck(),
+            Jogo.FORA_DO_JOGO : Area(),
+            Jogo.AREA_DE_AMEACA : Area(),
+            Jogo.LOCALIZACAO_ATIVA : Area()
+        }
+
+    @property
+    def deck_de_missao(self):
+        return self.locais[Jogo.DECK_DE_MISSAO]
+
+    @deck_de_missao.setter
+    def deck_de_missao(self, d):
+        self.locais[Jogo.DECK_DE_MISSAO] = d
+
+    @property
+    def deck_de_encontro(self):
+        return self.locais[Jogo.DECK_DE_ENCONTRO]
+
+    @deck_de_encontro.setter
+    def deck_de_encontro(self, d):
+        self.locais[Jogo.DECK_DE_ENCONTRO] = d
+
+    @property
+    def fora_do_jogo(self):
+        return self.locais[Jogo.FORA_DO_JOGO]
+
+    @fora_do_jogo.setter
+    def fora_do_jogo(self, a):
+        self.locais[Jogo.FORA_DO_JOGO] = a
+
+    @property
+    def area_de_ameaca(self):
+        return self.locais[Jogo.AREA_DE_AMEACA]
+
+    @area_de_ameaca.setter
+    def area_de_ameaca(self, a):
+        self.locais[Jogo.AREA_DE_AMEACA] = a
+
+    @property
+    def localizacao_ativa(self):
+        return self.locais[Jogo.LOCALIZACAO_ATIVA]
+
+    @localizacao_ativa.setter
+    def localizacao_ativa(self, a):
+        self.locais[Jogo.LOCALIZACAO_ATIVA] = a
 
     def novo_jogador(self, nome):
         self.jogadores.append(Jogador(nome))
@@ -118,3 +189,10 @@ class Jogo():
         self.nome_cenario = nome
         self.deck_de_missao = deck_de_missao
         self.deck_de_encontro = deck_de_encontro
+
+    def mover_carta(self, nome_carta, origem, destino):
+        deck_origem = self.locais[origem]
+        deck_destino = self.locais[destino]
+        carta = deck_origem.retirar(nome_carta)
+        print('Carta:', carta.nome)
+        deck_destino.nova_carta(carta)
