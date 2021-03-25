@@ -1,5 +1,9 @@
 import sys
 import re
+import json
+
+import requests
+from bs4 import BeautifulSoup
 
 from . import Hero, Card, Deck
 
@@ -39,6 +43,17 @@ def criar_cartas_aliados(lista):
         i = i.replace(f'{quantidade}x','')
         for j in range(quantidade):
             yield Card(i.strip())
+
+def abrir_link(link):
+    r = requests.get(link)
+    texto = r.text
+    soup = BeautifulSoup(texto, 'html.parser')
+    script_json = soup.find_all('script',type='text/javascript')[1].contents[0]
+    pattern = r'app.deck.init\((?P<deck>.*)\)'
+    m = re.search(pattern, str(script_json))
+    if m:
+        return json.loads(m.group('deck'))
+    return {}
 
 def abrir_arquivo(nome_arquivo):
     with open(nome_arquivo,'r') as f:
