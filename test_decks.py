@@ -1,6 +1,6 @@
 import pytest
 
-from lord import import_deck
+from lord import scrap, loader
 from lord import Hero, Jogo, Deck
 import lord
 
@@ -37,38 +37,9 @@ def deck_de_encontro():
     deck.nova_carta(lord.Location('Bag End',0,3,vitoria = 1))
     return deck
 
-
-def test_extrair_linhas_arquivo():
-    linhas = import_deck.abrir_arquivo('rohanrideout-1.0.txt')
-    assert linhas
-
-def test_importar_decks():
-    linhas = import_deck.abrir_arquivo('rohanrideout-1.0.txt')
-    deck_herois, deck_jogador = import_deck.montar_deck(linhas)
-    assert deck_herois.total == 3
-    assert isinstance(deck_herois.cartas[2] , Hero)
-    assert deck_jogador.total > 0
-
-def test_montar_mesa(jogo_com_um_jogador, deck_de_missao, deck_de_encontro):
-    linhas = import_deck.abrir_arquivo('rohanrideout-1.0.txt')
-    deck_herois, deck_jogador = import_deck.montar_deck(linhas)
-    jogo = jogo_com_um_jogador
-    jogo.escolher_cenario('A Shadow of the Past', deck_de_missao, deck_de_encontro)
-    jogo.jogador1.usar_decks(deck_herois, deck_jogador)
-    jogo.jogador1.comprar_mão_inicial()
-    jogo.mover_carta('Buckleberry Ferry',jogo.DECK_DE_ENCONTRO,jogo.FORA_DO_JOGO)
-    jogo.mover_carta('Black Rider',jogo.DECK_DE_ENCONTRO,jogo.AREA_DE_AMEACA)
-    jogo.mover_carta('Bag End',jogo.DECK_DE_ENCONTRO,jogo.LOCALIZACAO_ATIVA)
-    assert 'Set Buckleberry Ferry aside' in jogo.deck_de_missao.cartas[0].texto_frente
-    assert jogo.fora_do_jogo.total > 0
-    assert jogo.fora_do_jogo.cartas[0].nome == 'Buckleberry Ferry'
-    assert jogo.area_de_ameaca.total > 0
-    assert jogo.area_de_ameaca.cartas[0].nome == 'Black Rider'
-
-def test_download_deck():
-    link = 'https://ringsdb.com/decklist/view/20040/fourhobbitsesss-1.0'
-    # deck_dict = import_deck.abrir_link(link)
-    deck_dict = {
+@pytest.fixture
+def deck_dict():
+    d = {
         'id': 20040,
         'name': 'Four Hobbitsesss',
         'date_creation': '2021-03-22T14:47:32-03:00',
@@ -130,4 +101,15 @@ def test_download_deck():
         'nb_comments': 0,
         'starting_threat': 25
     }
+    return d
+
+
+def test_download_deck(deck_dict):
+    link = 'https://ringsdb.com/decklist/view/20040/fourhobbitsesss-1.0'
+    # deck_dict = scrap.abrir_link(link)
     assert deck_dict['name'] == 'Four Hobbitsesss'
+    slots = deck_dict['slots']
+    assert slots
+    deck = loader.criar_deck_jogador(slots)
+    cartas = deck.procurar_cartas_por_nome('Galadriel')
+    assert len(cartas) == 1

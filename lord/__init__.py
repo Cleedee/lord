@@ -49,6 +49,9 @@ class Deck():
     def retirar(self, nome_carta):
         return next((self.cartas.pop(i) for i, l in enumerate(self.cartas) if l.nome == nome_carta), None)
 
+    def procurar_cartas_por_nome(self, nome):
+        return [carta for carta in self.cartas if carta.nome == nome]
+
 class Area(Deck):
     def __init__(self):
         super().__init__()
