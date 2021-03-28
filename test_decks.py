@@ -111,5 +111,5 @@ def test_download_deck(deck_dict):
     slots = deck_dict['slots']
     assert slots
     deck = loader.criar_deck_jogador(slots)
-    cartas = deck.procurar_cartas_por_nome('Galadriel')
-    assert len(cartas) == 1
+    cartas = deck.procurar_cartas_por_nome('06010')
+    assert len(cartas) == 2

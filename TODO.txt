@@ -1,0 +1,8 @@
+ * base de dados para salvar os decks, as cartas e as partidas
+   * usar ORM Peewee por ser leve e ter migrations
+   * usar SQLite por ser um banco de dados em um arquivo
+ * interface de usuário (Kivy, KivyMD)
+ * criar protótipo da interface de usuário
+ * deve ser possível repassar a partida do início ao fim
+ * deve ser possível jogar offline com um ou mais decks
+ * deve ser possível jogar online com um ou mais jogadores

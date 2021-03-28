@@ -43,7 +43,7 @@ class Deck():
     def total(self):
         return len(self.cartas)
 
-    def nova_carta(self, carta):
+    def nova_carta(self, carta: Card):
         self.cartas.append(carta)
 
     def retirar(self, nome_carta):
