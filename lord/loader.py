@@ -1,16 +1,23 @@
-from . import Deck, Card
-from . import scrap
+from . import Deck, Card, Hero
+from . import repository as rep
+from . import database
 
-def iterador_de_slots(slots):
-    for slot in slots.items(): yield slot
+def carrega_deck_jogador(codigo):
+    deck = rep.encontra_deck(codigo)
+    if not deck: return
+    deck_jogo = Deck()
+    cards_player = rep.encontra_slots(database.Slot.SLOT_SLOTS, deck.id)
+    for slot in cards_player:
+        for i in range(slot.quantity):
+            deck_jogo.nova_carta(Card(slot.card.name))
+    return deck_jogo
 
-def criar_deck_jogador(slots):
-    deck = Deck()
-    for codigo, quant in iterador_de_slots(slots):
-        # carta_dict = scrap.pegar_carta(f'https://ringsdb.com/card/{codigo}')
-        # esse codigo fica pesado para testar
-        # usaremos decks salvos no banco de dados
-        for i in range(quant):
-            deck.nova_carta(Card(codigo))
-            #deck.nova_carta(Card(carta_dict['card-name']))
-    return deck
+def carregar_deck_herois(codigo):
+    deck = rep.encontra_deck(codigo)
+    if not deck: return
+    deck_jogo = Deck()
+    cards_hero = rep.encontra_slots(database.Slot.SLOT_HEROES, deck.id)
+    for slot in cards_hero:
+        for i in range(slot.quantity):
+            deck_jogo.nova_carta(Hero(slot.card.name, slot.card.threat))
+    return deck_jogo

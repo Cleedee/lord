@@ -7,6 +7,26 @@ def encontra_carta(codigo):
 def encontra_deck(codigo_deck):
     return Deck.get_or_none(id = codigo_deck)
 
+def encontra_slots(slot_type, deck_id):
+    return Slot.select().where(
+        (Slot.slot_type == slot_type) &
+        (Slot.deck == deck_id)
+    )
+
+def _salva_slot(slot_type, slots, deck):
+    for slot in slots:
+        print(slot)
+        c = encontra_carta(slot)
+        if not c:
+            carta = pegar_carta_jogador(slot)
+            c = Card.create(**carta)
+        slot = Slot.create(
+            slot_type=slot_type,
+            deck = deck,
+            card = c,
+            quantity = slots[slot]
+        )
+
 def salva_deck(codigo_deck):
     if encontra_deck(codigo_deck):
         return False
@@ -25,45 +45,9 @@ def salva_deck(codigo_deck):
             is_published = deck['is_published'],
             starting_threat = deck['starting_threat']
         )
-        print('SLOTS')
-        for slot in deck['slots']:
-            print(slot)
-            c = encontra_carta(slot)
-            if not c:
-                carta = pegar_carta_jogador(slot)
-                c = Card.create(**carta)
-            slot = Slot.create(
-                slot_type=Slot.SLOT_SLOTS,
-                deck = d,
-                card = c,
-                quantity = deck['slots'][slot]
-            )
-        print('SIDESLOTS')
-        for slot in deck['sideslots']:
-            print(slot)
-            c = encontra_carta(slot)
-            if not c:
-                carta = pegar_carta_jogador(slot)
-                c = Card.create(**carta)
-            slot = Slot.create(
-                slot_type=Slot.SLOT_SIDESLOTS,
-                deck = d,
-                card = c,
-                quantity = deck['sideslots'][slot]
-            )
-        print('HEROES')
-        for slot in deck['heroes']:
-            print(slot)
-            c = encontra_carta(slot)
-            if not c:
-                carta = pegar_carta_jogador(slot)
-                c = Card.create(**carta)
-            slot = Slot.create(
-                slot_type=Slot.SLOT_HEROES,
-                deck = d,
-                card = c,
-                quantity = deck['heroes'][slot]
-            )
+        _salva_slot(Slot.SLOT_SLOTS, deck['slots'], d)
+        _salva_slot(Slot.SLOT_SIDESLOTS, deck['sideslots'], d)
+        _salva_slot(Slot.SLOT_HEROES, deck['heroes'], d)
     return True
 
 def salva_card(carta):

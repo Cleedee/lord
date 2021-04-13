@@ -102,14 +102,3 @@ def deck_dict():
         'starting_threat': 25
     }
     return d
-
-
-def test_download_deck(deck_dict):
-    link = 'https://ringsdb.com/decklist/view/20040/fourhobbitsesss-1.0'
-    # deck_dict = scrap.abrir_link(link)
-    assert deck_dict['name'] == 'Four Hobbitsesss'
-    slots = deck_dict['slots']
-    assert slots
-    deck = loader.criar_deck_jogador(slots)
-    cartas = deck.procurar_cartas_por_nome('06010')
-    assert len(cartas) == 2
