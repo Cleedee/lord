@@ -5,3 +5,4 @@ lord/lord.egg-info/*
 .ipynb_checkpoints/*
 lord/__pycache__/*.pyc
 *.pyc
+database.db

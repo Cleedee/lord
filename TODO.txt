@@ -1,8 +1,15 @@
- * base de dados para salvar os decks, as cartas e as partidas
-   * usar ORM Peewee por ser leve e ter migrations
-   * usar SQLite por ser um banco de dados em um arquivo
- * interface de usuário (Kivy, KivyMD)
- * criar protótipo da interface de usuário
- * deve ser possível repassar a partida do início ao fim
- * deve ser possível jogar offline com um ou mais decks
- * deve ser possível jogar online com um ou mais jogadores
+* base de dados para salvar os decks, as cartas e as partidas
+    * usar ORM Peewee por ser leve e ter migrations
+    * usar SQLite por ser um banco de dados em um arquivo
+* interface de usuário (Kivy, KivyMD)
+* criar protótipo da interface de usuário
+    * evento de clique do botão [OK]
+    * mudar de tela ao clicar no botão [OK]
+        * https://www.techwithtim.net/tutorials/kivy-tutorial/multiple-screens/
+    * montar uma lista de decks cadastrados pelo nome
+    * baixar cartas por demanda
+        * https://stackoverflow.com/questions/37502084/download-file-with-kivy-app-without-locking-event-loop
+        * https://gist.github.com/dustinfarris/8876216
+* deve ser possível repassar a partida do início ao fim
+* deve ser possível jogar offline com um ou mais decks
+* deve ser possível jogar online com um ou mais jogadores
