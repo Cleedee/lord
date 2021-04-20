@@ -1,6 +1,9 @@
 from .scrap import pegar_deck_jogador, pegar_carta_jogador
 from .database import Card, Deck, Slot, db
 
+def encontra_decks():
+    return Deck.select()
+
 def encontra_carta(codigo):
     return Card.get_or_none(code = codigo)
 
