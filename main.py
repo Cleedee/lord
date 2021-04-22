@@ -5,7 +5,7 @@ from kivy.uix.button import Button
 
 from kivymd.app import MDApp
 
-from lord.repository import encontra_decks
+from lord.repository import encontra_decks, encontra_deck_por_nome
 
 class MainWindow(Screen):
     pass
@@ -32,9 +32,15 @@ class ListaDecks(GridLayout):
         app = MDApp.get_running_app()
         app.root.transition = SlideTransition(direction='left')
         app.root.current = 'deck_window'
-        print(instance.text)
+        deck = encontra_deck_por_nome(instance.text)
+        app.deck_atual = deck
+        print(deck.starting_threat)
 
 class LordApp(MDApp):
+
+    def __init__(self, **kwargs):
+        MDApp.__init__(self, **kwargs)
+        self.deck_atual = None
 
     def build(self):
         self.title = 'Lord'

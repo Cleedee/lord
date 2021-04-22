@@ -10,6 +10,9 @@ def encontra_carta(codigo):
 def encontra_deck(codigo_deck):
     return Deck.get_or_none(id = codigo_deck)
 
+def encontra_deck_por_nome(nome):
+    return Deck.get(Deck.name == nome)
+
 def encontra_slots(slot_type, deck_id):
     return Slot.select().where(
         (Slot.slot_type == slot_type) &
