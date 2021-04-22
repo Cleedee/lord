@@ -1,5 +1,5 @@
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 
@@ -10,26 +10,29 @@ from lord.repository import encontra_decks
 class MainWindow(Screen):
     pass
 
+class DecksWindow(Screen):
+    pass
+
+class DeckWindow(Screen):
+    pass
+
+class WindowManager(ScreenManager):
+    pass
+
 class ListaDecks(GridLayout):
     def __init__(self, **kwargs):
-        # construtor
-        # GridLayout(cols=1, spacing=10, size_hint_y=None)
         GridLayout.__init__(self, **kwargs)
         self.bind(minimum_height=self.setter('height'))
         decks = encontra_decks()
         for deck in decks:
-            btn = Button(text=deck.name, size_hint_y=None, height=40)
+            btn = Button(text=deck.name, size_hint_y=None, height=40, on_release = self.para_os_decks)
             self.add_widget(btn)
-        #self.add_widget(Button(text='Voltar', size_hint_y=None, height=40))
 
-
-class DecksWindow(Screen):
-    pass
-
-
-
-class WindowManager(ScreenManager):
-    pass
+    def para_os_decks(self, instance):
+        app = MDApp.get_running_app()
+        app.root.transition = SlideTransition(direction='left')
+        app.root.current = 'deck_window'
+        print(instance.text)
 
 class LordApp(MDApp):
 
