@@ -1,0 +1,76 @@
+#!python
+
+import argparse
+
+import lord.repository as rep
+from lord.scrap import pegar_deck_jogador
+from lord.database import Slot
+from lord.utils import somente_aliados
+
+if __name__ == '__main__':
+    meu_parser = argparse.ArgumentParser(description='Jogar Lord of the Rings LCG por linha de comando')
+    meu_parser.add_argument('Dominio',
+        metavar='dominio',
+        type=str,
+        choices=['base','play','ringsdb'],
+        help='base | play | ringsdb')
+    meu_parser.add_argument(
+        '-l',
+        '--list',
+        action='store_true',
+        help='lista algo'
+    )
+    meu_parser.add_argument(
+        '-d',
+        '--decks',
+        action='store_true',
+        help='opera sobre decks'
+    )
+    meu_parser.add_argument(
+        '-c',
+        '--card',
+        action='store_true',
+        help='opera sobre cartas'
+    )
+    meu_parser.add_argument(
+        '-s',
+        '--search',
+        action='store',
+        help='pesquisa algo'
+    )
+
+    args = meu_parser.parse_args()
+
+    if args.Dominio == 'base':
+        if args.list:
+            if args.decks:
+                lista = rep.encontra_decks()
+                if lista:
+                    for deck in lista:
+                        print(f'{deck.name} ({deck.starting_threat})')
+        if args.search:
+            if args.card:
+                lista = rep.encontra_carta_por_nome(args.search)
+                print(f'Cartas encontradas: {len(lista)}')
+                for carta in lista:
+                    print(carta.name)
+            if args.decks:
+                deck = rep.encontra_deck_por_nome(args.search)
+                if deck:
+                    heroes = rep.encontra_slots(Slot.SLOT_HEROES, deck.id)
+                    cards = rep.encontra_slots(Slot.SLOT_SLOTS, deck.id)
+                    allies = somente_aliados(cards)
+                    total_allies = sum([s.quantity for s in allies])
+                    total_cards = sum([c.quantity for c in cards])
+                    print(deck.name)
+                    print('------')
+                    print(f'Starting Threat: {deck.starting_threat}')
+                    print(f'{len(heroes)} Heroes, {total_cards} Cards')
+                    print()
+                    print(f'Ally ({total_allies})')
+    if args.Dominio == 'ringsdb':
+        if args.search:
+            codigo = args.search
+            salvou = rep.salva_deck(codigo)
+            if salvou:
+                print('Deck encontrado e salvo.')

@@ -15,3 +15,5 @@
 * deve ser possível repassar a partida do início ao fim
 * deve ser possível jogar offline com um ou mais decks
 * deve ser possível jogar online com um ou mais jogadores
+
+lord --decks

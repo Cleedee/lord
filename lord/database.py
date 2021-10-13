@@ -29,6 +29,10 @@ class Card(Model):
     class Meta:
         database = db
 
+    @property
+    def is_ally(self) -> bool:
+        return self.type_code == 'ally'
+
 class Deck(Model):
     name = CharField()
     date_creation = DateTimeField()
