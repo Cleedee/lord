@@ -31,6 +31,12 @@ def _salva_slot(slot_type, slots, deck):
         if not c:
             carta = pegar_carta_jogador(slot)
             c = Card.create(**carta)
+        else:
+            # TODO atualizar o custo de cartas já baixadas
+            carta = pegar_carta_jogador(slot)
+            if carta.cost is None:
+                carta.cost = c.cost
+
         slot = Slot.create(
             slot_type=slot_type,
             deck = deck,

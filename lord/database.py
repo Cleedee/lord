@@ -25,6 +25,7 @@ class Card(Model):
     has_errata = BooleanField(default=False)
     url = CharField(default=False)
     imagesrc = CharField(default='')
+    cost = CharField(default=None)
 
     class Meta:
         database = db
@@ -32,6 +33,14 @@ class Card(Model):
     @property
     def is_ally(self) -> bool:
         return self.type_code == 'ally'
+
+    @property
+    def is_attachment(self) -> bool:
+        return self.type_code == 'attachment'
+
+    @property
+    def is_event(self) -> bool:
+        return self.type_code == 'event'
 
 class Deck(Model):
     name = CharField()
