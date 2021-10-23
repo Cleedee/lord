@@ -6,12 +6,14 @@
     * evento de clique do botão [OK]
     * mudar de tela ao clicar no botão [OK]
         * https://www.techwithtim.net/tutorials/kivy-tutorial/multiple-screens/
-    * montar uma lista de decks cadastrados pelo nome
+    * montar uma lista de decks cadastrados pelo nome [OK]
         * https://gist.github.com/talhasch/f0fce63aac9c73637077
         * https://kivy.org/doc/stable/api-kivy.uix.scrollview.html#module-kivy.uix.scrollview
     * baixar cartas por demanda
         * https://stackoverflow.com/questions/37502084/download-file-with-kivy-app-without-locking-event-loop
         * https://gist.github.com/dustinfarris/8876216
+    * usar o ESC para voltar para a tela anterior
+    * mostrar a lista de cartas do deck
 * deve ser possível repassar a partida do início ao fim
 * deve ser possível jogar offline com um ou mais decks
 * deve ser possível jogar online com um ou mais jogadores
