@@ -25,23 +25,16 @@ def encontra_slots(slot_type, deck_id) -> List[Slot]:
     )
 
 def _salva_slot(slot_type, slots, deck):
-    for slot in slots:
-        print(slot)
-        c = encontra_carta(slot)
+    for code_card in slots:
+        c = encontra_carta(code_card)
         if not c:
-            carta = pegar_carta_jogador(slot)
+            carta = pegar_carta_jogador(code_card)
             c = Card.create(**carta)
-        else:
-            # TODO atualizar o custo de cartas já baixadas
-            carta = pegar_carta_jogador(slot)
-            if carta.cost is None:
-                carta.cost = c.cost
-
         slot = Slot.create(
             slot_type=slot_type,
             deck = deck,
             card = c,
-            quantity = slots[slot]
+            quantity = slots[code_card]
         )
 
 def salva_deck(codigo_deck):
@@ -67,9 +60,17 @@ def salva_deck(codigo_deck):
         _salva_slot(Slot.SLOT_HEROES, deck['heroes'], d)
     return True
 
-def salva_card(carta):
-    if not encontra_carta(carta['code']):
+def salva_card(carta: dict) -> bool:
+    c  = encontra_carta(carta['code'])
+    if not c:
         c = Card(**carta)
         c.save()
         return True
+    else:
+        if c.cost is None:
+            # algumas cartas estão sem custo
+            if 'cost' in carta.keys():
+                c.cost = carta['cost']
+                c.save()
+                return True
     return False

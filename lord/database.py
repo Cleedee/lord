@@ -42,6 +42,14 @@ class Card(Model):
     def is_event(self) -> bool:
         return self.type_code == 'event'
 
+    @property
+    def is_contract(self) -> bool:
+        return self.type_code == 'contract'
+
+    @property
+    def is_treasure(self) -> bool:
+        return self.type_code == 'treasure'
+
 class Deck(Model):
     name = CharField()
     date_creation = DateTimeField()
