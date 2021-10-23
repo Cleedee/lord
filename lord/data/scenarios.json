@@ -460,7 +460,7 @@
                     "stage_a": {
                         "value": "",
                         "title": "",
-                        "description": """
+                        "description": "
                         <p>Begin with the standard quest deck and encounter deck
                         for the Passage Through Mirkwood scenario found in the
                         LOTR LCG core set.</p><p>Remove the following cards, in
@@ -474,7 +474,7 @@
                         Mirkwood encounter deck.</p><p>Finally, flip this setup
                         card over and place it next to the quest deck. Its effect
                         remains active throughout the game, which is now ready to begin.</p>
-                        """
+                        "
                     },
                     "stage_b": {
                         "value": "",
