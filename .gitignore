@@ -6,3 +6,4 @@ lord/lord.egg-info/*
 lord/__pycache__/*.pyc
 *.pyc
 database.db
+NOTAS.txt
