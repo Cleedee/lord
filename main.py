@@ -2,10 +2,13 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.properties import ObjectProperty
 
 from kivymd.app import MDApp
 
 from lord.repository import encontra_decks, encontra_deck_por_nome
+from lord.database import Deck
 
 class MainWindow(Screen):
     pass
@@ -33,21 +36,32 @@ class ListaDecks(GridLayout):
         app.root.transition = SlideTransition(direction='left')
         app.root.current = 'deck_window'
         deck = encontra_deck_por_nome(instance.text)
+        print(app.title)
         app.deck_atual = deck
         print(deck.starting_threat)
 
+class ListagemDeck(GridLayout):
+    def __init__(self, **kwargs):
+        GridLayout.__init__(self, **kwargs)
+        self.bind(minimum_height=self.setter('height'))
+        #app = MDApp.get_running_app()
+        #self.add_widget(Label(text='Main Deck'))
+        #self.add_widget(Label(text='Starting Threat: '))
+        #self.add_widget(Label(text='3 Heroes, 57 cards '))
+
+
 class LordApp(MDApp):
+    deck_atual = ObjectProperty(Deck())
 
     def __init__(self, **kwargs):
         MDApp.__init__(self, **kwargs)
-        self.deck_atual = None
 
     def build(self):
         self.title = 'Lord'
         self.theme_cls.theme_style = "Dark"
 
-    def mostra_mensagem(self):
-        print(self.user_data_dir)
+    def on_deck_atual(self, instance, value):
+        print('My property a changed to', value)
 
 
 LordApp().run()
