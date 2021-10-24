@@ -2,7 +2,7 @@
 from typing import List
 import re
 
-from lord.database import Slot, Deck
+from lord.database import Slot, Deck, Game
 from lord.scrap import pegar_carta_jogador
 import lord.repository as rep
 
@@ -109,4 +109,7 @@ def opcao_base(args):
             mostrar_deck(deck)
 
 def opcao_play(args):
-    ...
+    if args.new:
+        # criar um game
+        rep.salva_game(Game())
+        print('Jogo criado.')

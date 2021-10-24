@@ -1,7 +1,7 @@
 from typing import List
 
 from .scrap import pegar_deck_jogador, pegar_carta_jogador
-from .database import Card, Deck, Slot, db
+from .database import Card, Deck, Slot, Game, db
 
 def encontra_carta_por_nome(nome: str) -> List[Card]:
     return Card.select().where(Card.name.contains(nome))
@@ -74,3 +74,7 @@ def salva_card(carta: dict) -> bool:
                 c.save()
                 return True
     return False
+
+def salva_game(game: Game) -> bool:
+    game.save()
+    return True

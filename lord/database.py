@@ -77,6 +77,15 @@ class Slot(Model):
     class Meta:
         database = db    
 
+class Game(Model):
+
+    nplayers = IntegerField(default=1)
+    rounds = IntegerField(default=1)
+    active = BooleanField(default=False)
+
+    class Meta:
+        database = db
+
 if __name__ == '__main__':
     db.connect()
     db.create_tables([Deck,Card,Slot])

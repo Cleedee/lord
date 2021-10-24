@@ -36,6 +36,12 @@ if __name__ == '__main__':
         help='pesquisa algo'
     )
     meu_parser.add_argument(
+        '-n',
+        '--new',
+        action='store_true',
+        help='cria algo'
+    )
+    meu_parser.add_argument(
         '--view',
         action='store',
         type=int,
@@ -48,3 +54,5 @@ if __name__ == '__main__':
         utils.opcao_base(args)
     if args.Dominio == 'ringsdb':
         utils.opcao_ringsdb(args)
+    if args.Dominio == 'play':
+        utils.opcao_play(args)
