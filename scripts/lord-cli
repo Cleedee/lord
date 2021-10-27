@@ -46,7 +46,13 @@ if __name__ == '__main__':
         action='store',
         type=int,
         help='detalha algo'
-    )    
+    )
+    meu_parser.add_argument(
+        '-a',
+        '--active',
+        action='store_true',
+        help='ativa algo'
+    )        
 
     args = meu_parser.parse_args()
 

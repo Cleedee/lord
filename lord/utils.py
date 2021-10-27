@@ -111,5 +111,15 @@ def opcao_base(args):
 def opcao_play(args):
     if args.new:
         # criar um game
-        rep.salva_game(Game())
+        g = Game()
+        if args.active:
+            g.active = True
+        rep.salva_game(g)
         print('Jogo criado.')
+    ativo = rep.encontra_game_ativo()
+    if not ativo:
+        print('Nenhum jogo ativo encontrado.')
+    else:
+        print('ID: {}'.format(ativo.id))
+        print('Número de Jogadores: {}'.format(ativo.nplayers))
+        print('Rodada corrente: {}'.format(ativo.rounds))

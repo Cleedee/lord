@@ -3,6 +3,9 @@ from typing import List
 from .scrap import pegar_deck_jogador, pegar_carta_jogador
 from .database import Card, Deck, Slot, Game, db
 
+def encontra_game_ativo() -> Game:
+    return Game.get(Game.active == True)
+
 def encontra_carta_por_nome(nome: str) -> List[Card]:
     return Card.select().where(Card.name.contains(nome))
 

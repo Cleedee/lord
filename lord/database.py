@@ -88,4 +88,4 @@ class Game(Model):
 
 if __name__ == '__main__':
     db.connect()
-    db.create_tables([Deck,Card,Slot])
+    db.create_tables([Deck,Card,Slot, Game])
