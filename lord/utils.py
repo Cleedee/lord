@@ -114,12 +114,21 @@ def opcao_play(args):
         g = Game()
         if args.active:
             g.active = True
+            ativo = rep.encontra_game_ativo()
+            if ativo:
+                ativo.active = False
+                rep.salva_game(ativo)
         rep.salva_game(g)
         print('Jogo criado.')
-    ativo = rep.encontra_game_ativo()
-    if not ativo:
-        print('Nenhum jogo ativo encontrado.')
+    elif args.list:
+        games = rep.encontra_games()
+        for game in games:
+            print('ID: {}'.format(game.id))
     else:
-        print('ID: {}'.format(ativo.id))
-        print('Número de Jogadores: {}'.format(ativo.nplayers))
-        print('Rodada corrente: {}'.format(ativo.rounds))
+        ativo = rep.encontra_game_ativo()
+        if not ativo:
+            print('Nenhum jogo ativo encontrado.')
+        else:
+            print('ID: {}'.format(ativo.id))
+            print('Número de Jogadores: {}'.format(ativo.nplayers))
+            print('Rodada corrente: {}'.format(ativo.rounds))

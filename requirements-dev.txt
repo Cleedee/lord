@@ -1,1 +1,2 @@
 peewee-moves==2.1.0
+jupyterlab==3.2.4

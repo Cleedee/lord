@@ -1,5 +1,5 @@
 from peewee import (SqliteDatabase, CharField, IntegerField, ForeignKeyField,
-    BooleanField, Model, DateTimeField)
+    BooleanField, Model, DateTimeField, TextField)
 
 db = SqliteDatabase('database.db')
 
@@ -13,7 +13,7 @@ class Card(Model):
     position = IntegerField()
     name = CharField()
     traits = CharField(null=True)
-    text = CharField(null=True)
+    text = TextField(null=True)
     is_unique = BooleanField(default=False)
     threat = IntegerField(default=0)
     willpower = IntegerField(default=0)
