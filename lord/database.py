@@ -25,7 +25,7 @@ class Card(Model):
     has_errata = BooleanField(default=False)
     url = CharField(default=False)
     imagesrc = CharField(default='')
-    cost = CharField(default=None)
+    cost = CharField(default=None,null=True)
 
     class Meta:
         database = db

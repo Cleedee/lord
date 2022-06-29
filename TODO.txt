@@ -5,7 +5,7 @@
 BASE
 ------------
 
-* importar cartas dos decks de encontro
+* importar cartas dos decks de encontro [OK]
 
 UI
 ------------

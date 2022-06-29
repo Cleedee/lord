@@ -2,7 +2,10 @@ import random
 from functools import reduce
 from collections import UserList
 
-class Card():
+from lord import repository as rep
+from lord import loader
+
+class Carta():
     def __init__(self, nome):
         self.nome = nome
         self.virado = False
@@ -13,7 +16,7 @@ class Card():
     def __repr__(self):
         return self.nome
 
-class Hero(Card):
+class Hero(Carta):
     def __init__(self, nome, custo_ameaça):
         super().__init__(nome)
         self.custo_ameaça = custo_ameaça
@@ -22,28 +25,36 @@ class Hero(Card):
     def adicionar_recurso(self):
         self.recursos += 1
 
-class Mission(Card):
+class Mission(Carta):
     def __init__(self, nome, texto_frente = '', texto_verso = ''):
         super().__init__(nome)
         self.texto_frente = texto_frente
         self.texto_verso = texto_verso
 
-class Location(Card):
+class Localidade(Carta):
     def __init__(self, nome, força_ameaça, pontos_missao, vitoria = 0):
         super().__init__(nome)
         self.força_ameaça = força_ameaça
         self.pontos_missao = pontos_missao
         self.vitoria = vitoria
 
-class Deck():
+class Baralho():
     def __init__(self):
         self.cartas = []
+
+    def __repr__(self):
+        if len(self.cartas) > 10:
+            return super().__repr__(self)
+        repr = ''
+        for carta in self.cartas:
+            repr += f'{carta.nome}\n'
+        return repr        
 
     @property
     def total(self):
         return len(self.cartas)
 
-    def nova_carta(self, carta: Card):
+    def nova_carta(self, carta: Carta):
         self.cartas.append(carta)
 
     def retirar(self, nome_carta):
@@ -52,9 +63,15 @@ class Deck():
     def procurar_cartas_por_nome(self, nome):
         return [carta for carta in self.cartas if carta.nome == nome]
 
-class Area(Deck):
+class Area(Baralho):
     def __init__(self):
         super().__init__()
+
+    def __repr__(self):
+        repr = ''
+        for carta in self.cartas:
+            repr += f'{carta.nome}\n'
+        return repr
 
 class Mão(UserList):
     def index(self, valor):
@@ -79,9 +96,9 @@ class Jogador():
     def usar_decks(self, deck_de_herois, deck_de_jogador):
         self.deck_de_herois = deck_de_herois
         self.deck_de_jogador = deck_de_jogador
-        self.herois_em_jogo = Deck()
+        self.herois_em_jogo = Baralho()
         self.herois_em_jogo.cartas = self.deck_de_herois.cartas[:]
-        self.deck_de_compra = Deck()
+        self.deck_de_compra = Baralho()
         self.deck_de_compra.cartas = self.deck_de_jogador.cartas[:]
 
     @property
@@ -122,6 +139,18 @@ class Jogador():
                 self.herois_em_jogo.cartas[count].recursos -= quantidade
                 break
 
+    @property
+    def recursos(self):
+        total = 0
+        for heroi in self.herois_em_jogo.cartas:
+            total += heroi.recursos
+        texto = ''
+        texto += 'Leadership: 0\n'
+        texto += 'Lore: 0\n'
+        texto += 'Spirit: 0\n'
+        texto += f'Tactics: {total}'
+        return texto
+
 
 class Jogo():
     DECK_DE_ENCONTRO = 'DECK_DE_ENCONTRO'
@@ -134,8 +163,8 @@ class Jogo():
         self.jogadores = []
         self.nome_cenario = ''
         self.locais = {
-            Jogo.DECK_DE_ENCONTRO : Deck(),
-            Jogo.DECK_DE_MISSAO : Deck(),
+            Jogo.DECK_DE_ENCONTRO : Baralho(),
+            Jogo.DECK_DE_MISSAO : Baralho(),
             Jogo.FORA_DO_JOGO : Area(),
             Jogo.AREA_DE_AMEACA : Area(),
             Jogo.LOCALIZACAO_ATIVA : Area()
@@ -199,3 +228,17 @@ class Jogo():
         carta = deck_origem.retirar(nome_carta)
         print('Carta:', carta.nome)
         deck_destino.nova_carta(carta)
+
+class Colecao():
+
+    def __init__(self):
+        self.decks = rep.encontra_decks()
+
+    def __repr__(self):
+        repr = ''
+        for deck in self.decks:
+            repr += f'{deck.id}) {deck.name}\n'
+        return repr
+
+    def pegar_deck_jogador(self, codigo):
+        return loader.carregar_deck(codigo)

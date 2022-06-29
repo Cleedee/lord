@@ -1,26 +1,30 @@
-from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.properties import ObjectProperty
+
 
 from kivymd.app import MDApp
 
 from lord.repository import encontra_decks, encontra_deck_por_nome
 from lord.database import Deck
 
+
 class MainWindow(Screen):
     pass
+
 
 class DecksWindow(Screen):
     pass
 
+
 class DeckWindow(Screen):
     pass
 
+
 class WindowManager(ScreenManager):
     pass
+
 
 class ListaDecks(GridLayout):
     def __init__(self, **kwargs):
@@ -28,7 +32,8 @@ class ListaDecks(GridLayout):
         self.bind(minimum_height=self.setter('height'))
         decks = encontra_decks()
         for deck in decks:
-            btn = Button(text=deck.name, size_hint_y=None, height=40, on_release = self.para_os_decks)
+            btn = Button(text=deck.name, size_hint_y=None,
+                         height=40, on_release=self.para_os_decks)
             self.add_widget(btn)
 
     def para_os_decks(self, instance):
@@ -40,14 +45,11 @@ class ListaDecks(GridLayout):
         app.deck_atual = deck
         print(deck.starting_threat)
 
+
 class ListagemDeck(GridLayout):
     def __init__(self, **kwargs):
         GridLayout.__init__(self, **kwargs)
         self.bind(minimum_height=self.setter('height'))
-        #app = MDApp.get_running_app()
-        #self.add_widget(Label(text='Main Deck'))
-        #self.add_widget(Label(text='Starting Threat: '))
-        #self.add_widget(Label(text='3 Heroes, 57 cards '))
 
 
 class LordApp(MDApp):

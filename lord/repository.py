@@ -3,8 +3,11 @@ from typing import List
 from .scrap import pegar_deck_jogador, pegar_carta_jogador
 from .database import Card, Deck, Slot, Game, db
 
+def encontra_game_por_id(id) -> Game:
+    return Game.get_or_none(id = id)
+
 def encontra_game_ativo() -> Game:
-    return Game.get(Game.active == True)
+    return Game.get_or_none(Game.active == True)
 
 def encontra_games() -> List[Game]:
     return Game.select()

@@ -9,4 +9,4 @@ def upgrade(migrator):
 
 
 def downgrade(migrator):
-    migrator.drop_column('card', 'card', 'field', cascade=True)
+    migrator.drop_column('card', 'cost', cascade=True)

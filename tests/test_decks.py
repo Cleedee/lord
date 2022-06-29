@@ -1,7 +1,7 @@
 import pytest
 
 from lord import scrap, loader
-from lord import Hero, Jogo, Deck
+from lord import Hero, Jogo, Baralho
 import lord
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def deck_de_missao():
     staging area and make Bag End the active location. Shuffle the encounter
     deck.
     """
-    deck = lord.Deck()
+    deck = Baralho()
     deck.nova_carta(lord.Mission('Three is Company',texto))
     deck.nova_carta(lord.Mission('A Shortcut to Mushrooms'))
     deck.nova_carta(lord.Mission('Escape to Buckland'))
@@ -26,7 +26,7 @@ def deck_de_missao():
 
 @pytest.fixture
 def deck_de_encontro():
-    deck = lord.Deck()
+    deck = Baralho()
     deck.nova_carta(lord.Card('A Shadow of the Past'))
     deck.nova_carta(lord.Card('Bag End'))
     deck.nova_carta(lord.Card('Woody End'))

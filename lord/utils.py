@@ -8,23 +8,30 @@ import lord.repository as rep
 
 TAG_RE = re.compile(r'<[^>]+>')
 
+
 def somente_aliados(slots: List[Slot]) -> List[Slot]:
     return [s for s in slots if s.card.is_ally]
+
 
 def somente_acessorios(slots: List[Slot]) -> List[Slot]:
     return [s for s in slots if s.card.is_attachment]
 
+
 def somente_eventos(slots: List[Slot]) -> List[Slot]:
     return [s for s in slots if s.card.is_event]
+
 
 def somente_contratos(slots: List[Slot]) -> List[Slot]:
     return [s for s in slots if s.card.is_contract]
 
+
 def somente_tesouros(slots: List[Slot]) -> List[Slot]:
     return [s for s in slots if s.card.is_treasure]
 
+
 def remover_tags(texto):
     return TAG_RE.sub('', texto)
+
 
 def mostrar_deck(deck: Deck):
     if deck:
@@ -39,7 +46,7 @@ def mostrar_deck(deck: Deck):
         total_attachments = sum([s.quantity for s in attachments])
         total_events = sum([c.quantity for c in events])
         total_contracts = sum([c.quantity for c in contracts])
-        total_treasures = sum([c.quantity for c in treasures])                    
+        total_treasures = sum([c.quantity for c in treasures])
         total_cards = sum([c.quantity for c in cards])
         print(deck.name)
         print('------')
@@ -63,7 +70,7 @@ def mostrar_deck(deck: Deck):
             print(f'{slot.quantity}x {slot.card.name}')
         print(f'Treasure ({total_treasures})')
         for slot in treasures:
-            print(f'{slot.quantity}x {slot.card.name}')                        
+            print(f'{slot.quantity}x {slot.card.name}')
 
 
 def opcao_ringsdb(args):
@@ -90,7 +97,8 @@ def opcao_base(args):
             lista = rep.encontra_carta_por_nome(args.search)
             print(f'Cartas encontradas: {len(lista)}')
             for index, carta in enumerate(lista):
-                print(f'{index}) {carta.name} [{carta.type_name},{carta.sphere_code}] ')
+                print(
+                    f'{index}) {carta.name} [{carta.type_name},{carta.sphere_code}] ')
             print('------------')
             if args.view is not None:
                 carta = lista[args.view]
@@ -102,11 +110,12 @@ def opcao_base(args):
                 print(f"{carta.type_name}. Cost: {carta.cost}")
                 print(carta.traits)
                 print()
-                print(remover_tags( carta.text))
+                print(remover_tags(carta.text))
                 print('------------')
         if args.decks:
             deck = rep.encontra_deck_por_nome(args.search)
             mostrar_deck(deck)
+
 
 def opcao_play(args):
     if args.new:
@@ -123,7 +132,20 @@ def opcao_play(args):
     elif args.list:
         games = rep.encontra_games()
         for game in games:
-            print('ID: {}'.format(game.id))
+            print('ID: {} {}'.format(game.id, '(ativo)' if game.active else ''))
+    elif args.search:
+        game= rep.encontra_game_por_id(args.search)
+        if game is None:
+            print('Jogo não encontrado.')
+        else:
+            if args.active:
+                game.active = True
+                ativo = rep.encontra_game_ativo()
+                if ativo:
+                    ativo.active = False
+                    rep.salva_game(ativo)
+                rep.salva_game(game)
+                
     else:
         ativo = rep.encontra_game_ativo()
         if not ativo:

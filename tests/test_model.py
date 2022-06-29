@@ -10,26 +10,26 @@ def jogo_com_um_jogador():
 
 @pytest.fixture
 def deck_duas_cartas():
-    deck = lord.Deck()
+    deck = lord.Baralho()
     deck.nova_carta(lord.Hero('Balin', 9))
-    deck.nova_carta(lord.Card('The One Ring'))
+    deck.nova_carta(lord.Carta('The One Ring'))
     return deck
 
 @pytest.fixture
 def deck_para_abertura():
-    deck = lord.Deck()
-    deck.nova_carta(lord.Card('Snowbourn Scout'))
-    deck.nova_carta(lord.Card('Windfola'))
-    deck.nova_carta(lord.Card('Rohan Warhorse'))
-    deck.nova_carta(lord.Card('Rohan Warhorse'))
-    deck.nova_carta(lord.Card('Firefoot'))
-    deck.nova_carta(lord.Card('Westfold Outrider'))
-    deck.nova_carta(lord.Card('Armored Destrier'))
+    deck = lord.Baralho()
+    deck.nova_carta(lord.Carta('Snowbourn Scout'))
+    deck.nova_carta(lord.Carta('Windfola'))
+    deck.nova_carta(lord.Carta('Rohan Warhorse'))
+    deck.nova_carta(lord.Carta('Rohan Warhorse'))
+    deck.nova_carta(lord.Carta('Firefoot'))
+    deck.nova_carta(lord.Carta('Westfold Outrider'))
+    deck.nova_carta(lord.Carta('Armored Destrier'))
     return deck
 
 @pytest.fixture
 def herois():
-    deck = lord.Deck()
+    deck = lord.Baralho()
     deck.nova_carta(lord.Hero('Elfhelm', 10))
     deck.nova_carta(lord.Hero('Éomer', 10))
     deck.nova_carta(lord.Hero('Éowyn', 9))
@@ -43,7 +43,7 @@ def deck_de_missao():
     staging area and make Bag End the active location. Shuffle the encounter
     deck.
     """
-    deck = lord.Deck()
+    deck = lord.Baralho()
     deck.nova_carta(lord.Mission('Three is Company',texto))
     deck.nova_carta(lord.Mission('A Shortcut to Mushrooms'))
     deck.nova_carta(lord.Mission('Escape to Buckland'))
@@ -51,15 +51,15 @@ def deck_de_missao():
 
 @pytest.fixture
 def deck_de_encontro():
-    deck = lord.Deck()
-    deck.nova_carta(lord.Card('A Shadow of the Past'))
-    deck.nova_carta(lord.Card('Bag End'))
-    deck.nova_carta(lord.Card('Woody End'))
-    deck.nova_carta(lord.Card('Stock-Brook'))
-    deck.nova_carta(lord.Card('Pathless Country'))
-    deck.nova_carta(lord.Card('Buckleberry Ferry'))
-    deck.nova_carta(lord.Card('Black Rider'))
-    deck.nova_carta(lord.Location('Bag End',0,3,vitoria = 1))
+    deck = lord.Baralho()
+    deck.nova_carta(lord.Carta('A Shadow of the Past'))
+    deck.nova_carta(lord.Carta('Bag End'))
+    deck.nova_carta(lord.Carta('Woody End'))
+    deck.nova_carta(lord.Carta('Stock-Brook'))
+    deck.nova_carta(lord.Carta('Pathless Country'))
+    deck.nova_carta(lord.Carta('Buckleberry Ferry'))
+    deck.nova_carta(lord.Carta('Black Rider'))
+    deck.nova_carta(lord.Localidade('Bag End',0,3,vitoria = 1))
     return deck
 
 
@@ -157,3 +157,10 @@ def test_carta_fora_do_jogo(jogo_com_um_jogador, deck_para_abertura,
     assert jogo.fora_do_jogo.cartas[0].nome == 'Buckleberry Ferry'
     assert jogo.area_de_ameaca.total > 0
     assert jogo.area_de_ameaca.cartas[0].nome == 'Black Rider'
+
+def test_total_recursos(jogo_com_um_jogador, deck_para_abertura, herois):
+    jogo = jogo_com_um_jogador
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    jogo.jogador1.adicionar_recursos()
+    assert jogo.jogador1.recursos == '3'

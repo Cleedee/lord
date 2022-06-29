@@ -5,8 +5,6 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-from . import Hero, Card, Deck
-
 def montar_parser_url(link):
     r = requests.get(link)
     return BeautifulSoup(r.text, 'html.parser')
