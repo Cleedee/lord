@@ -6,19 +6,40 @@ from lord import repository as rep
 from lord import loader
 
 class Carta():
-    def __init__(self, nome):
+    def __init__(self, nome, esfera='neutral'):
         self.nome = nome
+        self.esfera = esfera
         self.virado = False
 
     def virar(self):
         self.virado = True
 
+    @property
+    def is_neutral(self):
+        return True if self.esfera == 'neutral' else False
+
+    @property
+    def is_leadership(self):
+        return True if self.esfera == 'leadership' else False
+    
+    @property
+    def is_lore(self):
+        return True if self.esfera == 'lore' else False
+
+    @property
+    def is_spirit(self):
+        return True if self.esfera == 'spirit' else False
+
+    @property
+    def is_tactics(self):
+        return True if self.esfera == 'tactics' else False
+
     def __repr__(self):
         return self.nome
 
 class Hero(Carta):
-    def __init__(self, nome, custo_ameaça):
-        super().__init__(nome)
+    def __init__(self, nome, custo_ameaça, esfera='neutral'):
+        super().__init__(nome, esfera)
         self.custo_ameaça = custo_ameaça
         self.recursos = 0
 
@@ -105,6 +126,54 @@ class Jogador():
     def mão(self):
         return self.hand
 
+    def _posicao_na_mao(self, posicao):
+        carta = self.hand[posicao - 1]
+        texto = f'{carta.nome}\n'
+        texto += f'Esfera: {carta.esfera}'
+        print(texto)
+        return texto
+
+    @property
+    def h1(self):
+        texto = self._posicao_na_mao(1)
+        return texto
+
+    @property
+    def h2(self):
+        texto = self._posicao_na_mao(2)
+        return texto
+
+    @property
+    def h3(self):
+        texto = self._posicao_na_mao(3)
+        return texto
+
+    @property
+    def h4(self):
+        texto = self._posicao_na_mao(4)
+        return texto
+
+    @property
+    def h5(self):
+        texto = self._posicao_na_mao(5)
+        return texto
+
+    @property
+    def h6(self):
+        texto = self._posicao_na_mao(6)
+        return texto
+
+    @property
+    def h7(self):
+        texto = self._posicao_na_mao(7)
+        return texto
+
+    @property
+    def hfim(self):
+        quantidade = len(self.hand)
+        texto = self._posicao_na_mao(quantidade)
+        return texto
+
     @property
     def ameaça(self):
         return sum(h.custo_ameaça for h in self.herois_em_jogo.cartas)
@@ -127,7 +196,6 @@ class Jogador():
 
     def jogar(self, nome_carta):
         pos = self.hand.index(nome_carta)
-        print(pos)
         carta = self.hand.pop(pos)
         if not carta:
             raise Exception
@@ -141,14 +209,22 @@ class Jogador():
 
     @property
     def recursos(self):
-        total = 0
+        leadership = lore = spirit = tactics = 0
         for heroi in self.herois_em_jogo.cartas:
-            total += heroi.recursos
+            if heroi.is_leadership:
+                leadership += heroi.recursos
+            if heroi.is_lore:
+                lore += heroi.recursos
+            if heroi.is_spirit:
+                spirit += heroi.recursos
+            if heroi.is_tactics:
+                tactics += heroi.recursos
         texto = ''
-        texto += 'Leadership: 0\n'
-        texto += 'Lore: 0\n'
-        texto += 'Spirit: 0\n'
-        texto += f'Tactics: {total}'
+        texto += f'Leadership: {leadership}\n'
+        texto += f'Lore: {lore}\n'
+        texto += f'Spirit: {spirit}\n'
+        texto += f'Tactics: {tactics}'
+        print(texto)
         return texto
 
 
@@ -211,7 +287,9 @@ class Jogo():
         self.locais[Jogo.LOCALIZACAO_ATIVA] = a
 
     def novo_jogador(self, nome):
-        self.jogadores.append(Jogador(nome))
+        novo = Jogador(nome)
+        self.jogadores.append(novo)
+        return novo
 
     @property
     def jogador1(self):

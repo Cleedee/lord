@@ -27,7 +27,15 @@ def pegar_deck_jogador(codigo: str) -> dict:
         return r.json()
     return {}
 
-def pegar_deck_aventura(link: str) -> dict:
-    deck = {}
-    soup = montar_parser_url(link)
-    return deck
+def pegar_deck_aventura(codigo: str) -> dict:
+    r = requests.get(f'https://ringsdb.com/api/public/scenario/{codigo}.json')
+    if r.status_code == 200:
+        return r.json()
+    return {}
+
+def pegar_packs() -> dict:
+    r = requests.get(f'https://ringsdb.com/api/public/packs')
+    if r.status_code == 200:
+        return r.json()
+    return {}
+

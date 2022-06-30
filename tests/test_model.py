@@ -18,21 +18,21 @@ def deck_duas_cartas():
 @pytest.fixture
 def deck_para_abertura():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Carta('Snowbourn Scout'))
-    deck.nova_carta(lord.Carta('Windfola'))
-    deck.nova_carta(lord.Carta('Rohan Warhorse'))
-    deck.nova_carta(lord.Carta('Rohan Warhorse'))
+    deck.nova_carta(lord.Carta('Snowbourn Scout', esfera='leadership'))
+    deck.nova_carta(lord.Carta('Windfola', esfera='spirit'))
+    deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
+    deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
     deck.nova_carta(lord.Carta('Firefoot'))
-    deck.nova_carta(lord.Carta('Westfold Outrider'))
-    deck.nova_carta(lord.Carta('Armored Destrier'))
+    deck.nova_carta(lord.Carta('Westfold Outrider', esfera='tactics'))
+    deck.nova_carta(lord.Carta('Armored Destrier', esfera='leadership'))
     return deck
 
 @pytest.fixture
 def herois():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Hero('Elfhelm', 10))
-    deck.nova_carta(lord.Hero('Éomer', 10))
-    deck.nova_carta(lord.Hero('Éowyn', 9))
+    deck.nova_carta(lord.Hero('Elfhelm', 10, esfera='leadership'))
+    deck.nova_carta(lord.Hero('Éomer', 10, esfera='leadership'))
+    deck.nova_carta(lord.Hero('Éowyn', 9, esfera='spirit'))
     return deck
 
 @pytest.fixture
@@ -138,8 +138,8 @@ def test_existe_cenario(jogo_com_um_jogador, deck_para_abertura,
     deck_de_missao, deck_de_encontro, herois):
     jogo = jogo_com_um_jogador
     jogo.escolher_cenario('A Shadow of the Past', deck_de_missao, deck_de_encontro)
-    jogo.jogador1.usar_decks(herois, deck_para_abertura)
-    jogo.jogador1.comprar_mão_inicial()
+    #jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    #jogo.jogador1.comprar_mão_inicial()
     assert jogo.deck_de_missao.total > 0
     assert jogo.deck_de_encontro.total > 0
 
@@ -163,4 +163,33 @@ def test_total_recursos(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     jogo.jogador1.adicionar_recursos()
-    assert jogo.jogador1.recursos == '3'
+    texto = ''
+    texto += 'Leadership: 2\n'
+    texto += 'Lore: 0\n'
+    texto += 'Spirit: 1\n'
+    texto += 'Tactics: 0'
+    assert jogo.jogador1.recursos == texto
+
+def test_ver_primeira_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
+    jogo = jogo_com_um_jogador
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    texto = 'Snowbourn Scout\n'
+    texto += 'Esfera: leadership'
+    assert jogo.jogador1.h1 == texto
+
+def test_ver_segunda_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
+    jogo = jogo_com_um_jogador
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    texto = 'Windfola\n'
+    texto += 'Esfera: spirit'
+    assert jogo.jogador1.h2 == texto
+
+def test_ver_ultima_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
+    jogo = jogo_com_um_jogador
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    texto = 'Westfold Outrider\n'
+    texto += 'Esfera: tactics'
+    assert jogo.jogador1.hfim == texto
