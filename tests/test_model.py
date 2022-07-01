@@ -18,11 +18,11 @@ def deck_duas_cartas():
 @pytest.fixture
 def deck_para_abertura():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Carta('Snowbourn Scout', esfera='leadership'))
+    deck.nova_carta(lord.Carta('Snowbourn Scout', esfera='leadership', custo=1))
     deck.nova_carta(lord.Carta('Windfola', esfera='spirit'))
     deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
     deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
-    deck.nova_carta(lord.Carta('Firefoot'))
+    deck.nova_carta(lord.Carta('Firefoot', esfera='tactics', custo=2))
     deck.nova_carta(lord.Carta('Westfold Outrider', esfera='tactics'))
     deck.nova_carta(lord.Carta('Armored Destrier', esfera='leadership'))
     return deck
@@ -191,5 +191,13 @@ def test_ver_ultima_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, heroi
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     texto = 'Westfold Outrider\n'
-    texto += 'Esfera: tactics'
+    texto += 'Esfera: tactics\n'
+    texto += "<b>Action:</b> Discard Westfold Outrider to choose an enemy not engaged with you. Engage the chosen enemy."
     assert jogo.jogador1.hfim == texto
+
+def test_custo_da_carta(jogo_com_um_jogador, deck_para_abertura, herois):
+    jogo = jogo_com_um_jogador
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    assert jogo.jogador1.hand[0].custo == 1 # Snowbourn Scout
+    assert jogo.jogador1.hand[4].custo == 2 # Firefoot

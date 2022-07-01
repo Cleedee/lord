@@ -6,9 +6,11 @@ from lord import repository as rep
 from lord import loader
 
 class Carta():
-    def __init__(self, nome, esfera='neutral'):
+    def __init__(self, nome, esfera='neutral', custo=1, texto=''):
         self.nome = nome
         self.esfera = esfera
+        self.custo = custo
+        self.texto = texto
         self.virado = False
 
     def virar(self):
@@ -128,8 +130,9 @@ class Jogador():
 
     def _posicao_na_mao(self, posicao):
         carta = self.hand[posicao - 1]
-        texto = f'{carta.nome}\n'
-        texto += f'Esfera: {carta.esfera}'
+        texto = f'{carta.nome} ({carta.custo})\n'
+        texto += f'Esfera: {carta.esfera}\n\n'
+        texto += f'{carta.texto}'
         print(texto)
         return texto
 

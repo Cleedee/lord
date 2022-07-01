@@ -9,7 +9,12 @@ def carrega_deck_jogador(codigo):
     cards_player = rep.encontra_slots(database.Slot.SLOT_SLOTS, deck.id)
     for slot in cards_player:
         for i in range(slot.quantity):
-            deck_jogo.nova_carta(lord.Carta(slot.card.name, esfera=slot.card.sphere_code))
+            deck_jogo.nova_carta(lord.Carta(
+                slot.card.name, 
+                esfera=slot.card.sphere_code, 
+                custo=slot.card.cost,
+                texto=slot.card.text)
+            )
     return deck_jogo
 
 def carregar_deck_herois(codigo):
@@ -19,7 +24,11 @@ def carregar_deck_herois(codigo):
     cards_hero = rep.encontra_slots(database.Slot.SLOT_HEROES, deck.id)
     for slot in cards_hero:
         for i in range(slot.quantity):
-            deck_jogo.nova_carta(lord.Hero(slot.card.name, slot.card.threat, esfera=slot.card.sphere_code))
+            deck_jogo.nova_carta(lord.Hero(
+                slot.card.name, 
+                slot.card.threat, 
+                esfera=slot.card.sphere_code,
+                texto=slot.card.text))
     return deck_jogo
 
 def carregar_deck(codigo):
