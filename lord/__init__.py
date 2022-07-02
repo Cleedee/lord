@@ -96,6 +96,11 @@ class Area(Baralho):
             repr += f'{carta.nome}\n'
         return repr
 
+class DeckDoJogador(Baralho):
+    def __init__(self):
+        # TODO
+        pass
+
 class Mão(UserList):
     def index(self, valor):
         for count, value in enumerate(self.data):
@@ -228,6 +233,13 @@ class Jogador():
         texto += f'Spirit: {spirit}\n'
         texto += f'Tactics: {tactics}'
         print(texto)
+        return texto
+
+    def __repr__(self):
+        texto = ''
+        texto += f'Jogador: {self.nome}\n'
+        texto += f'Primeiro jogador: Sim\n'
+        texto += f'Deck: ?'
         return texto
 
 
