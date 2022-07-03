@@ -107,7 +107,7 @@ def test_mão_inicial(jogo_com_um_jogador, deck_para_abertura, herois):
 def test_ameaça_inicial_é_29(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
-    assert jogo.jogador1.ameaça == 29
+    assert jogo.jogador1.ameaça_inicial == 29
 
 def test_total_recursos_pos_fase_recursos(jogo_com_um_jogador, deck_para_abertura,
     herois):

@@ -126,7 +126,7 @@ class Jogador():
         self.herois_em_jogo.cartas = self.deck_de_herois.cartas[:]
         self.deck_de_compra = Baralho()
         self.deck_de_compra.cartas = self.deck_de_jogador.cartas[:]
-        self.total_ameaça = self.ameaça
+        self.total_ameaça = self.ameaça_inicial
 
     @property
     def mão(self):
@@ -182,9 +182,8 @@ class Jogador():
         return texto
 
     @property
-    def ameaça(self):
-        return sum(h.custo_ameaça for h in self.herois_em_jogo.cartas)
-        #return reduce((lambda x, y: x.custo_ameaça + y.custo_ameaça), self.espaço_herois)
+    def ameaça_inicial(self):
+        return sum(h.custo_ameaça for h in self.deck_de_herois.cartas)
 
     def embaralhar_deck(self):
         random.shuffle(self.deck_de_compra.cartas)
