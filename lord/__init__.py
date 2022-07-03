@@ -40,8 +40,8 @@ class Carta():
         return self.nome
 
 class Hero(Carta):
-    def __init__(self, nome, custo_ameaça, esfera='neutral'):
-        super().__init__(nome, esfera)
+    def __init__(self, nome, custo_ameaça, esfera='neutral', custo=1, texto=''):
+        super().__init__(nome, esfera, custo, texto)
         self.custo_ameaça = custo_ameaça
         self.recursos = 0
 
@@ -96,10 +96,6 @@ class Area(Baralho):
             repr += f'{carta.nome}\n'
         return repr
 
-class DeckDoJogador(Baralho):
-    def __init__(self):
-        # TODO
-        pass
 
 class Mão(UserList):
     def index(self, valor):
@@ -120,6 +116,8 @@ class Jogador():
         self.deck_de_descarte = None
         self.herois_em_jogo = Area()
         self.mesa = Area()
+        self.jogo: Jogo = None
+        self.total_ameaça = 0
 
     def usar_decks(self, deck_de_herois, deck_de_jogador):
         self.deck_de_herois = deck_de_herois
@@ -128,6 +126,7 @@ class Jogador():
         self.herois_em_jogo.cartas = self.deck_de_herois.cartas[:]
         self.deck_de_compra = Baralho()
         self.deck_de_compra.cartas = self.deck_de_jogador.cartas[:]
+        self.total_ameaça = self.ameaça
 
     @property
     def mão(self):
@@ -235,11 +234,20 @@ class Jogador():
         print(texto)
         return texto
 
-    def __repr__(self):
+    def _herois_em_linha(self):
         texto = ''
+        for heroi in self.herois_em_jogo.cartas:
+            texto += f'{heroi.nome} ({heroi.recursos}) '
+        return texto
+
+    def __repr__(self):
+        texto = '-------------------\n'
         texto += f'Jogador: {self.nome}\n'
+        texto += f'Ameaça: {self.total_ameaça}\n'
+        texto += f'Pontos de Vitória: 0\n'
         texto += f'Primeiro jogador: Sim\n'
-        texto += f'Deck: ?'
+        texto += f'Herois: {self._herois_em_linha()}\n'
+        texto += '-------------------'
         return texto
 
 
@@ -260,6 +268,7 @@ class Jogo():
             Jogo.AREA_DE_AMEACA : Area(),
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
+        self.primeiro_jogador = None
 
     @property
     def deck_de_missao(self):
@@ -303,12 +312,17 @@ class Jogo():
 
     def novo_jogador(self, nome):
         novo = Jogador(nome)
+        novo.jogo = self
         self.jogadores.append(novo)
         return novo
 
     @property
     def jogador1(self):
         return self.jogadores[0] if self.jogadores else None
+
+    @property
+    def jogador2(self):
+        return self.jogadores[1] if self.jogadores and len(self.jogadores) > 1 else None
 
     def escolher_cenario(self,nome, deck_de_missao, deck_de_encontro):
         self.nome_cenario = nome

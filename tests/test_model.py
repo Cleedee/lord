@@ -9,6 +9,13 @@ def jogo_com_um_jogador():
     return jogo
 
 @pytest.fixture
+def jogo_com_dois_jogadores():
+    jogo = lord.Jogo()
+    jogo.novo_jogador('Paulo')
+    jogo.novo_jogador('Maria')
+    return jogo
+
+@pytest.fixture
 def deck_duas_cartas():
     deck = lord.Baralho()
     deck.nova_carta(lord.Hero('Balin', 9))
@@ -174,26 +181,15 @@ def test_ver_primeira_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, her
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
-    texto = 'Snowbourn Scout\n'
-    texto += 'Esfera: leadership'
-    assert jogo.jogador1.h1 == texto
+    texto = 'Snowbourn Scout'
+    assert jogo.jogador1.mão[0].nome == texto
 
 def test_ver_segunda_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
-    texto = 'Windfola\n'
-    texto += 'Esfera: spirit'
-    assert jogo.jogador1.h2 == texto
-
-def test_ver_ultima_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
-    jogo = jogo_com_um_jogador
-    jogo.jogador1.usar_decks(herois, deck_para_abertura)
-    jogo.jogador1.comprar_mão_inicial()
-    texto = 'Westfold Outrider\n'
-    texto += 'Esfera: tactics\n'
-    texto += "<b>Action:</b> Discard Westfold Outrider to choose an enemy not engaged with you. Engage the chosen enemy."
-    assert jogo.jogador1.hfim == texto
+    texto = 'Windfola'
+    assert jogo.jogador1.mão[1].nome == texto
 
 def test_custo_da_carta(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
@@ -201,3 +197,7 @@ def test_custo_da_carta(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.comprar_mão_inicial()
     assert jogo.jogador1.hand[0].custo == 1 # Snowbourn Scout
     assert jogo.jogador1.hand[4].custo == 2 # Firefoot
+
+def test_primeiro_jogador(jogo_com_dois_jogadores):
+    jogo = jogo_com_dois_jogadores
+    assert jogo.primeiro_jogador == None
