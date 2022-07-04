@@ -1,7 +1,7 @@
 from typing import List
 
 from .scrap import pegar_deck_jogador, pegar_carta_jogador
-from .database import Card, Deck, Slot, Game, db
+from .database import Card, Deck, Slot, Game, Scenario, db
 
 def encontra_game_por_id(id) -> Game:
     return Game.get_or_none(id = id)
@@ -87,3 +87,6 @@ def salva_card(carta: dict) -> bool:
 def salva_game(game: Game) -> bool:
     game.save()
     return True
+
+def salva_scenario(scenario: Scenario):
+    scenario.save()

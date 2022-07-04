@@ -35,3 +35,6 @@ def carregar_deck(codigo):
     deck_herois = carregar_deck_herois(codigo)
     deck_jogador = carrega_deck_jogador(codigo)
     return (deck_herois, deck_jogador)
+
+def carregar_deck_cenario(codigo):
+    ...

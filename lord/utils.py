@@ -1,8 +1,9 @@
 
 from typing import List
 import re
+import pandas as pd
 
-from lord.database import Slot, Deck, Game
+from lord.database import Slot, Deck, Game, Scenario
 from lord.scrap import pegar_carta_jogador
 import lord.repository as rep
 
@@ -31,6 +32,57 @@ def somente_tesouros(slots: List[Slot]) -> List[Slot]:
 
 def remover_tags(texto):
     return TAG_RE.sub('', texto)
+
+def importar_cenarios():
+    df = pd.read_excel('lord/data/cartas.xls')
+    df['WP'] = pd.to_numeric(df['WP'], errors='coerce')
+    df['WP'] = df['WP'].fillna(0)
+    #df['WP'] = df['WP'].astype(int)
+    tipos = "Type in ['Enemy','Quest','Location','Treachery','Objective','Objective - Ally']"
+    campos = [
+        'Number', 'Name', 'Type', 'Unique', 'Text', 'Shadow','Abbr','Threat',
+        'Traits','Keywords', 'WP', 'HP', 'ATK', 'DEF', 'Cycle', 'Encounter Set', 'Q#',
+        'Quest', 'Notes', 'Link', 'Count','Box','Engage'
+    ]
+    df_scenario = df.query(tipos)[campos]
+    type_codes = {
+        'Enemy':'enemy',
+        'Quest':'quest',
+        'Location':'location',
+        'Treachery':'treachery',
+        'Objective':'objective',
+        'Objective - Ally':'objective_ally',
+    }
+    for carta in df_scenario.to_dict('records'):
+        scenario = Scenario(
+            type_code = type_codes[carta['Type']],
+            type_name = carta['Type'],
+            number = int(carta['Number']),
+            name = carta['Name'],
+            is_unique = True if carta['Unique'] == 'Unique' else False,
+            text = carta['Text'],
+            shadow = carta['Shadow'],
+            pack_code = carta['Abbr'],
+            pack_name = carta['Box'],
+            threat = carta['Threat'],
+            traits = carta['Traits'],
+            keywords = carta['Keywords'],
+            willpower = int(carta['WP']),
+            attack = carta['ATK'],
+            defense = carta['DEF'],
+            health = carta['HP'],
+            cycle = carta['Cycle'],
+            encounter_set = carta['Encounter Set'],
+            quest_points = carta['Quest'],
+            sequence = carta['Q#'],
+            notes = carta['Notes'],
+            count = carta['Count'],
+            engage = carta['Engage']
+        )
+        print('Salvando {}'.format(scenario.name))
+        rep.salva_scenario(scenario)
+        print('Salvo.')
+    print('Importação realizada com sucesso.')
 
 
 def mostrar_deck(deck: Deck):

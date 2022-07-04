@@ -97,20 +97,20 @@ class Scenario(Model):
     shadow = TextField(null=True)
     pack_code = CharField() # Abbr
     pack_name = CharField() # Box
-    threat = IntegerField(default=0)
+    threat = CharField(null=True)
     traits = CharField(null=True)
-    kaywords = CharField(null=True)
+    keywords = CharField(null=True)
     willpower = IntegerField(default=0) # WP
-    attack = IntegerField(default=0)
-    defense = IntegerField(default=0)  
-    health = IntegerField(default=0) # HP  
+    attack = TextField(null=True) # ATK
+    defense = TextField(null=True) # DEF
+    health = TextField(null=True) # HP  
     cycle = CharField(null=True)
     encounter_set = CharField(null=True)
-    quest_points = IntegerField(default=0) # Quest
-    sequence = IntegerField(default=0) # Q#
+    quest_points = CharField(null=True) # Quest
+    sequence = CharField(null=True) # Q#
     notes = TextField(null=True)
-    count = IntegerField(default=0)
-    engage = IntegerField(default=0)
+    count = CharField(null=True)
+    engage = CharField(null=True)
 
     class Meta:
         database = db    
