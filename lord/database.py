@@ -86,6 +86,35 @@ class Game(Model):
     class Meta:
         database = db
 
+class Scenario(Model):
+
+    type_code = CharField()
+    type_name = CharField()
+    number = IntegerField()
+    name = CharField()
+    is_unique = BooleanField(default=False)
+    text = TextField(null=True)
+    shadow = TextField(null=True)
+    pack_code = CharField() # Abbr
+    pack_name = CharField() # Box
+    threat = IntegerField(default=0)
+    traits = CharField(null=True)
+    kaywords = CharField(null=True)
+    willpower = IntegerField(default=0) # WP
+    attack = IntegerField(default=0)
+    defense = IntegerField(default=0)  
+    health = IntegerField(default=0) # HP  
+    cycle = CharField(null=True)
+    encounter_set = CharField(null=True)
+    quest_points = IntegerField(default=0) # Quest
+    sequence = IntegerField(default=0) # Q#
+    notes = TextField(null=True)
+    count = IntegerField(default=0)
+    engage = IntegerField(default=0)
+
+    class Meta:
+        database = db    
+
 if __name__ == '__main__':
     db.connect()
-    db.create_tables([Deck,Card,Slot, Game])
+    db.create_tables([Deck,Card,Slot, Game, Scenario])
