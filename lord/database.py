@@ -3,6 +3,14 @@ from peewee import (SqliteDatabase, CharField, IntegerField, ForeignKeyField,
 
 db = SqliteDatabase('database.db')
 
+CENARIOS_CONJUNTOS = {
+    'Passage Through Mirkwood' : [
+        'Dol Guldur Orcs',
+        'Passage Through Mirkwood',
+        'Spiders of Mirkwood'
+    ],
+}
+
 class Card(Model):
     code = IntegerField()
     pack_code = CharField()
@@ -107,6 +115,7 @@ class Scenario(Model):
     cycle = CharField(null=True)
     encounter_set = CharField(null=True)
     quest_points = CharField(null=True) # Quest
+    victory = CharField(null=True)
     sequence = CharField(null=True) # Q#
     notes = TextField(null=True)
     count = CharField(null=True)

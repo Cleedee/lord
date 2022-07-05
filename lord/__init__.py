@@ -6,15 +6,22 @@ from lord import repository as rep
 from lord import loader
 
 class Carta():
-    def __init__(self, nome, esfera='neutral', custo=1, texto=''):
+    def __init__(self, nome, texto='', atributos=''):
         self.nome = nome
-        self.esfera = esfera
-        self.custo = custo
-        self.texto = texto
+        self.atributos=atributos
         self.virado = False
 
     def virar(self):
         self.virado = True
+
+    def __repr__(self):
+        return self.nome
+
+class CartaJogador(Carta):
+    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
+        super().__init__(nome, texto=texto, atributos=atributos)
+        self.esfera = esfera
+        self.custo = custo
 
     @property
     def is_neutral(self):
@@ -36,17 +43,51 @@ class Carta():
     def is_tactics(self):
         return True if self.esfera == 'tactics' else False
 
-    def __repr__(self):
-        return self.nome
+    @property
+    def is_baggins(self):
+        return True if self.esfera == 'baggins' else False
 
-class Hero(Carta):
-    def __init__(self, nome, custo_ameaça, esfera='neutral', custo=1, texto=''):
-        super().__init__(nome, esfera, custo, texto)
+
+class Hero(CartaJogador):
+    def __init__(self, nome, custo_ameaça, força_vontade, ataque,
+        defesa, pontos_vida, texto='', esfera='neutral', atributos=''):
+        super().__init__(nome, texto=texto, esfera=esfera, atributos=atributos)
         self.custo_ameaça = custo_ameaça
+        self.força_vontade = força_vontade
+        self.ataque = ataque
+        self.defesa = defesa
+        self.pontos_vida = pontos_vida
         self.recursos = 0
+        self.dano = 0
 
     def adicionar_recurso(self):
         self.recursos += 1
+
+    def __repr__(self):
+        texto = ''
+        texto += f'Nome: {self.nome} ({self.custo_ameaça})\n'
+        texto += f'{self.atributos}\n'
+        texto += f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}'
+        return texto
+
+
+class Acessorio(CartaJogador):
+    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
+        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=atributos)
+
+class Aliado(CartaJogador):
+    def __init__(self, nome, força_vontade, ataque,
+        defesa, pontos_vida, texto='', esfera='neutral', custo=1, atributos=''):
+        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=atributos)
+        self.força_vontade = força_vontade
+        self.ataque = ataque
+        self.defesa = defesa
+        self.pontos_vida = pontos_vida
+        self.dano = 0
+
+class Evento(CartaJogador):
+    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
+        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=custo)
 
 class Mission(Carta):
     def __init__(self, nome, texto_frente = '', texto_verso = ''):
@@ -60,6 +101,9 @@ class Localidade(Carta):
         self.força_ameaça = força_ameaça
         self.pontos_missao = pontos_missao
         self.vitoria = vitoria
+
+class Inimigo(Carta):
+    pass
 
 class Baralho():
     def __init__(self):
@@ -348,3 +392,9 @@ class Colecao():
 
     def pegar_deck_jogador(self, codigo):
         return loader.carregar_deck(codigo)
+
+    def jogar(self, jogo, nome_cenario):
+        jogo.nome_cenario = nome_cenario
+        d1, d2 = loader.carregar_deck_cenario(nome_cenario)
+        jogo.deck_de_missao = d1
+        jogo.deck_de_encontro = d2

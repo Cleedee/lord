@@ -18,28 +18,55 @@ def jogo_com_dois_jogadores():
 @pytest.fixture
 def deck_duas_cartas():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Hero('Balin', 9))
+    deck.nova_carta(lord.Hero('Balin', 9, 2, 1, 2, 4, esfera='leadership'))
     deck.nova_carta(lord.Carta('The One Ring'))
     return deck
 
 @pytest.fixture
 def deck_para_abertura():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Carta('Snowbourn Scout', esfera='leadership', custo=1))
-    deck.nova_carta(lord.Carta('Windfola', esfera='spirit'))
-    deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
-    deck.nova_carta(lord.Carta('Rohan Warhorse', esfera='tactics'))
-    deck.nova_carta(lord.Carta('Firefoot', esfera='tactics', custo=2))
-    deck.nova_carta(lord.Carta('Westfold Outrider', esfera='tactics'))
-    deck.nova_carta(lord.Carta('Armored Destrier', esfera='leadership'))
+    deck.nova_carta(lord.Aliado('Snowbourn Scout', 
+        texto="""Response: After Snowbourn Scout enters play, choose a location. 
+            Place 1 progress token on that location.""", 
+        esfera='leadership',
+        força_vontade=0, ataque=0, defesa=1, pontos_vida=1, custo=1))
+    deck.nova_carta(lord.Acessorio('Windfola', 
+        """
+        Attach to a spirit hero, or to Éowyn. Restricted.
+
+        Attached character gets +1 willpower.
+
+        Response: After attached character is removed from the quest, exhaust Windfola to 
+        commit attached hero to the quest.
+        """,
+        esfera='spirit'))
+    deck.nova_carta(lord.Acessorio('Rohan Warhorse', 
+        """
+        Attach to a  or Rohan hero. Restricted.
+
+        Response: After attached hero participates in an attack that destroys an enemy, 
+        exhaust Rohan Warhorse to ready attached hero.
+        """,
+        esfera='tactics'))
+    deck.nova_carta(lord.Acessorio('Rohan Warhorse', 
+        """
+        Attach to a  or Rohan hero. Restricted.
+
+        Response: After attached hero participates in an attack that destroys an enemy, 
+        exhaust Rohan Warhorse to ready attached hero.
+        """,
+        esfera='tactics'))
+    deck.nova_carta(lord.Acessorio('Firefoot', esfera='tactics', custo=2))
+    deck.nova_carta(lord.Aliado('Westfold Outrider', 0, 2, 1, 2, esfera='tactics'))
+    deck.nova_carta(lord.Acessorio('Armored Destrier', esfera='leadership'))
     return deck
 
 @pytest.fixture
 def herois():
     deck = lord.Baralho()
-    deck.nova_carta(lord.Hero('Elfhelm', 10, esfera='leadership'))
-    deck.nova_carta(lord.Hero('Éomer', 10, esfera='leadership'))
-    deck.nova_carta(lord.Hero('Éowyn', 9, esfera='spirit'))
+    deck.nova_carta(lord.Hero('Elfhelm', 10, 2, 2, 2, 4, esfera='leadership'))
+    deck.nova_carta(lord.Hero('Éomer', 10, 1, 3, 2, 4, esfera='leadership'))
+    deck.nova_carta(lord.Hero('Éowyn', 9,4, 1, 1, 3, esfera='spirit'))
     return deck
 
 @pytest.fixture

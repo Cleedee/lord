@@ -42,7 +42,7 @@ def importar_cenarios():
     campos = [
         'Number', 'Name', 'Type', 'Unique', 'Text', 'Shadow','Abbr','Threat',
         'Traits','Keywords', 'WP', 'HP', 'ATK', 'DEF', 'Cycle', 'Encounter Set', 'Q#',
-        'Quest', 'Notes', 'Link', 'Count','Box','Engage'
+        'Quest', 'Notes', 'Link', 'Count', 'Box', 'Engage', 'Victory'
     ]
     df_scenario = df.query(tipos)[campos]
     type_codes = {
@@ -74,6 +74,7 @@ def importar_cenarios():
             cycle = carta['Cycle'],
             encounter_set = carta['Encounter Set'],
             quest_points = carta['Quest'],
+            victory = carta['Victory'],
             sequence = carta['Q#'],
             notes = carta['Notes'],
             count = carta['Count'],
