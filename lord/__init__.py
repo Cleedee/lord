@@ -6,9 +6,11 @@ from lord import repository as rep
 from lord import loader
 
 class Carta():
-    def __init__(self, nome, texto='', atributos=''):
+    def __init__(self, nome, **args):
         self.nome = nome
-        self.atributos=atributos
+        self.texto = args['text']
+        self.atributos= args['traits']
+        self.numero = args['number']
         self.virado = False
 
     def virar(self):
@@ -18,10 +20,9 @@ class Carta():
         return self.nome
 
 class CartaJogador(Carta):
-    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
-        super().__init__(nome, texto=texto, atributos=atributos)
-        self.esfera = esfera
-        self.custo = custo
+    def __init__(self, nome, **args):
+        super().__init__(nome, **args)
+        self.esfera = args['sphere_code']
 
     @property
     def is_neutral(self):
@@ -49,14 +50,13 @@ class CartaJogador(Carta):
 
 
 class Hero(CartaJogador):
-    def __init__(self, nome, custo_ameaça, força_vontade, ataque,
-        defesa, pontos_vida, texto='', esfera='neutral', atributos=''):
-        super().__init__(nome, texto=texto, esfera=esfera, atributos=atributos)
-        self.custo_ameaça = custo_ameaça
-        self.força_vontade = força_vontade
-        self.ataque = ataque
-        self.defesa = defesa
-        self.pontos_vida = pontos_vida
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo_ameaça = kwargs['threat']
+        self.força_vontade = kwargs['willpower']
+        self.ataque = kwargs['attack']
+        self.defesa = kwargs['defense']
+        self.pontos_vida = kwargs['health']
         self.recursos = 0
         self.dano = 0
 
@@ -72,38 +72,92 @@ class Hero(CartaJogador):
 
 
 class Acessorio(CartaJogador):
-    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
-        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=atributos)
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo = kwargs['cost']
 
 class Aliado(CartaJogador):
-    def __init__(self, nome, força_vontade, ataque,
-        defesa, pontos_vida, texto='', esfera='neutral', custo=1, atributos=''):
-        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=atributos)
-        self.força_vontade = força_vontade
-        self.ataque = ataque
-        self.defesa = defesa
-        self.pontos_vida = pontos_vida
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo = kwargs['cost']
+        self.força_vontade = kwargs['willpower']
+        self.ataque = kwargs['attack']
+        self.defesa = kwargs['defense']
+        self.pontos_vida = kwargs['health']
         self.dano = 0
 
+    def __str__(self):
+        texto = ''
+        texto += f'{self.nome}\n'
+        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
+        texto += f'Força de Vontade: {self.força_vontade}\n'
+        texto += f'Ataque: {self.ataque}\n'
+        texto += f'Defesa: {self.defesa}\n'
+        texto += f'Dano/PV: {self.dano}/{self.pontos_vida}\n'
+        texto += '------------\n'
+        texto += f'Atributos: {self.atributos}\n'
+        texto += '------------'
+        texto += f'{self.texto}\n'
+        return texto
+
 class Evento(CartaJogador):
-    def __init__(self, nome, texto='', esfera='neutral', custo=1, atributos=''):
-        super().__init__(nome, texto=texto, esfera=esfera, custo=custo, atributos=custo)
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo = kwargs['cost']
 
-class Mission(Carta):
-    def __init__(self, nome, texto_frente = '', texto_verso = ''):
-        super().__init__(nome)
-        self.texto_frente = texto_frente
-        self.texto_verso = texto_verso
+class CartaCenario(Carta):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
 
-class Localidade(Carta):
-    def __init__(self, nome, força_ameaça, pontos_missao, vitoria = 0):
-        super().__init__(nome)
-        self.força_ameaça = força_ameaça
-        self.pontos_missao = pontos_missao
-        self.vitoria = vitoria
+class Mission(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
 
-class Inimigo(Carta):
-    pass
+class Localidade(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.força_ameaça = kwargs['threat']
+        self.pontos_missao = kwargs['quest_points']
+        self.vitoria = kwargs['victory']
+        self.conjunto_encontro = kwargs['encounter_set']
+        self.efeito_sombrio = kwargs['shadow']
+
+
+class Infortunio(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.conjunto_encontro = kwargs['encounter_set']
+        self.efeito_sombrio = kwargs['shadow']
+
+class Objetivo(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.conjunto_encontro = kwargs['encounter_set']
+        self.efeito_sombrio = kwargs['shadow']
+
+class ObjetivoAliado(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.força_vontade = kwargs['willpower']
+        self.ataque = kwargs['attack']
+        self.defesa = kwargs['defense']
+        self.pontos_vida = kwargs['health']
+        self.dano = 0
+
+
+class Inimigo(CartaCenario):
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo_engajamento = kwargs['engage']
+        self.força_ameaça = kwargs['threat']
+        self.ataque = kwargs['attack']
+        self.defesa = kwargs['defense']
+        self.pontos_vida = kwargs['health']
+        self.conjunto_encontro = kwargs['encounter_set']
+        self.efeito_sombrio = kwargs['shadow']
+        self.dano = 0
+
+
 
 class Baralho():
     def __init__(self):
@@ -111,7 +165,7 @@ class Baralho():
 
     def __repr__(self):
         if len(self.cartas) > 10:
-            return super().__repr__(self)
+            return super().__repr__()
         repr = ''
         for carta in self.cartas:
             repr += f'{carta.nome}\n'
@@ -178,52 +232,43 @@ class Jogador():
 
     def _posicao_na_mao(self, posicao):
         carta = self.hand[posicao - 1]
-        texto = f'{carta.nome} ({carta.custo})\n'
-        texto += f'Esfera: {carta.esfera}\n\n'
-        texto += f'{carta.texto}'
-        print(texto)
-        return texto
+        print(carta)
 
     @property
     def h1(self):
-        texto = self._posicao_na_mao(1)
-        return texto
+        self._posicao_na_mao(1)
 
     @property
     def h2(self):
-        texto = self._posicao_na_mao(2)
-        return texto
+        self._posicao_na_mao(2)
 
     @property
     def h3(self):
-        texto = self._posicao_na_mao(3)
-        return texto
+        self._posicao_na_mao(3)
 
     @property
     def h4(self):
-        texto = self._posicao_na_mao(4)
-        return texto
+        self._posicao_na_mao(4)
 
     @property
     def h5(self):
-        texto = self._posicao_na_mao(5)
-        return texto
+        self._posicao_na_mao(5)
 
     @property
     def h6(self):
-        texto = self._posicao_na_mao(6)
-        return texto
+        self._posicao_na_mao(6)
 
     @property
     def h7(self):
-        texto = self._posicao_na_mao(7)
-        return texto
+        self._posicao_na_mao(7)
 
     @property
     def hfim(self):
         quantidade = len(self.hand)
-        texto = self._posicao_na_mao(quantidade)
-        return texto
+        self._posicao_na_mao(quantidade)
+
+    def h(self, posicao):
+        self._posicao_na_mao(posicao)
 
     @property
     def ameaça_inicial(self):

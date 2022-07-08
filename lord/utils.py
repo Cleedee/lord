@@ -3,8 +3,9 @@ from typing import List
 import re
 import pandas as pd
 
-from lord.database import Slot, Deck, Game, Scenario
+from lord.database import Slot, Deck, Game, Scenario, Card
 from lord.scrap import pegar_carta_jogador
+import lord
 import lord.repository as rep
 
 TAG_RE = re.compile(r'<[^>]+>')
@@ -84,6 +85,89 @@ def importar_cenarios():
         rep.salva_scenario(scenario)
         print('Salvo.')
     print('Importação realizada com sucesso.')
+
+
+def carta_para_dicionario(card: Card) -> dict:
+    return {
+        'pack_code': card.pack_code,
+        'pack_name': card.pack_name,
+        'type_code': card.type_code,
+        'type_name': card.type_name,
+        'sphere_code': card.sphere_code,
+        'number': card.position,
+        'name': card.name,
+        'traits': card.traits,
+        'text': card.text,
+        'is_unique': card.is_unique,
+        'threat': card.threat,
+        'willpower': card.willpower,
+        'attack': card.attack,
+        'defense': card.defense,
+        'health': card.health,
+        'quantity': card.quantity,
+        'deck_limit': card.deck_limit,
+        'has_errata': card.has_errata,
+        'url': card.url,
+        'imagesrc': card.imagesrc,
+        'cost': card.cost
+    }
+
+
+def pegar_classe_da_carta_jogador(carta: Card):
+    if carta.type_code == 'hero':
+        return lord.Hero
+    elif carta.type_code == 'ally':
+        return lord.Aliado
+    elif carta.type_code == 'event':
+        return lord.Evento
+    elif carta.type_code == 'attachment':
+        return lord.Acessorio
+    else:
+        raise Exception("Esse carta não é de jogador ou não configurada ");
+
+def carta_cenario_para_dicionario(card: Scenario) -> dict:
+    return {
+        'number': card.number, # ok
+        'pack_code': card.pack_code, # ok
+        'pack_name': card.pack_name, # ok
+        'type_code': card.type_code, # ok
+        'type_name': card.type_name, # ok
+        'name': card.name, # ok
+        'shadow': card.shadow, # ok
+        'traits': card.traits, # ok
+        'text': card.text, # ok
+        'is_unique': card.is_unique, # ok
+        'threat': card.threat, # ok
+        'willpower': card.willpower, # ok
+        'attack': card.attack, # ok
+        'defense': card.defense, # ok
+        'health': card.health, # ok
+        'keywords': card.keywords, # ok
+        'cycle': card.cycle, # ok
+        'encounter_set': card.encounter_set,# ok
+        'quest_points': card.quest_points, # ok
+        'sequence': card.sequence, #ok
+        'quantity': card.count, # ok
+        'victory': card.victory, # ok
+        'notes': card.notes,
+        'engage': card.engage
+    }    
+
+def pegar_classe_da_carta_cenario(carta: Scenario):
+    if carta.type_code == 'enemy':
+        return lord.Inimigo
+    elif carta.type_code == 'quest':
+        return lord.Mission
+    elif carta.type_code == 'location':
+        return lord.Localidade
+    elif carta.type_code == 'treachery':
+        return lord.Infortunio
+    elif carta.type_code == 'objective':
+        return lord.Objetivo
+    elif carta.type_code == 'objective_ally':
+        return lord.ObjetivoAliado
+    else:
+        raise Exception(f"Essa carta não é do decek de cenário. [{carta.name}]")
 
 
 def mostrar_deck(deck: Deck):
