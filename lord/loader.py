@@ -2,6 +2,7 @@ import lord
 from . import repository as rep
 from . import database
 from . import utils
+from . import collections
 
 def carrega_deck_jogador(codigo):
     deck = rep.encontra_deck(codigo)
@@ -36,7 +37,7 @@ def carregar_deck_cenario(nome):
     deck_missao = lord.Baralho()
     deck_encontro = lord.Baralho()
     cartas = []
-    for conjunto in database.CENARIOS_CONJUNTOS[nome]:
+    for conjunto in collections.CENARIOS_CONJUNTOS[nome]['conjuntos']:
         cartas.extend(rep.encontra_cartas_conjunto_por_nome(conjunto))
     for carta in cartas:
         campos = utils.carta_cenario_para_dicionario(carta)

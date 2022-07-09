@@ -3,13 +3,6 @@ from peewee import (SqliteDatabase, CharField, IntegerField, ForeignKeyField,
 
 db = SqliteDatabase('database.db')
 
-CENARIOS_CONJUNTOS = {
-    'Passage Through Mirkwood' : [
-        'Dol Guldur Orcs',
-        'Passage Through Mirkwood',
-        'Spiders of Mirkwood'
-    ],
-}
 
 class Card(Model):
     code = IntegerField()

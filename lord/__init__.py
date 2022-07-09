@@ -3,14 +3,16 @@ from functools import reduce
 from collections import UserList
 
 from lord import repository as rep
-from lord import loader
+from lord import loader, utils, collections
+from lord.collections import CENARIOS_CONJUNTOS
 
 class Carta():
     def __init__(self, nome, **args):
         self.nome = nome
-        self.texto = args['text']
+        self.texto =  utils.remover_tags(args['text'])
         self.atributos= args['traits']
         self.numero = args['number']
+        self.tipo = args['type_code']
         self.virado = False
 
     def virar(self):
@@ -72,11 +74,23 @@ class Hero(CartaJogador):
 
 
 class Acessorio(CartaJogador):
+
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo = kwargs['cost']
 
+    def __str__(self):
+        texto = ''
+        texto += f'{self.nome} ({self.tipo})\n'
+        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
+        texto += '------------\n'
+        texto += f'Atributos: {self.atributos}\n'
+        texto += '------------\n'
+        texto += f'{self.texto}\n'
+        return texto
+
 class Aliado(CartaJogador):
+
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo = kwargs['cost']
@@ -88,15 +102,13 @@ class Aliado(CartaJogador):
 
     def __str__(self):
         texto = ''
-        texto += f'{self.nome}\n'
+        texto += f'{self.nome} ({self.tipo})\n'
         texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
-        texto += f'Força de Vontade: {self.força_vontade}\n'
-        texto += f'Ataque: {self.ataque}\n'
-        texto += f'Defesa: {self.defesa}\n'
-        texto += f'Dano/PV: {self.dano}/{self.pontos_vida}\n'
+        texto += f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
+        texto += f'Dano: {self.dano}\n'
         texto += '------------\n'
         texto += f'Atributos: {self.atributos}\n'
-        texto += '------------'
+        texto += '------------\n'
         texto += f'{self.texto}\n'
         return texto
 
@@ -104,6 +116,16 @@ class Evento(CartaJogador):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo = kwargs['cost']
+
+    def __str__(self):
+        texto = ''
+        texto += f'{self.nome} ({self.tipo})\n'
+        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
+        texto += '------------\n'
+        texto += f'Atributos: {self.atributos}\n'
+        texto += '------------\n'
+        texto += f'{self.texto}\n'
+        return texto
 
 class CartaCenario(Carta):
     def __init__(self, nome, **kwargs):
@@ -183,6 +205,9 @@ class Baralho():
 
     def procurar_cartas_por_nome(self, nome):
         return [carta for carta in self.cartas if carta.nome == nome]
+
+    def comprar(self):
+        return self.cartas.pop()
 
 class Area(Baralho):
     def __init__(self):
@@ -421,8 +446,15 @@ class Jogo():
         deck_origem = self.locais[origem]
         deck_destino = self.locais[destino]
         carta = deck_origem.retirar(nome_carta)
-        print('Carta:', carta.nome)
         deck_destino.nova_carta(carta)
+
+    def embaralhar_deck_encontro(self):
+        random.shuffle(self.deck_de_encontro.cartas)
+
+    def setup(self):
+        preparacao = CENARIOS_CONJUNTOS[self.nome_cenario]['setup']
+        preparacao(self)
+
 
 class Colecao():
 
@@ -443,3 +475,4 @@ class Colecao():
         d1, d2 = loader.carregar_deck_cenario(nome_cenario)
         jogo.deck_de_missao = d1
         jogo.deck_de_encontro = d2
+        jogo.embaralhar_deck_encontro()

@@ -17,14 +17,14 @@ def jogo_com_dois_jogadores():
 
 @pytest.fixture
 def deck_duas_cartas():
-    base = {'text':'', 'traits':'','number': 0}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'hero'}
     balin = {
         'threat': 9,
         'willpower': 2,
         'attack': 1,
         'defense': 2,
         'health': 4,
-        'sphere_code': 'leadership'
+        'sphere_code': 'leadership',
     }
     balin.update(base)
     deck = lord.Baralho()
@@ -35,7 +35,7 @@ def deck_duas_cartas():
 @pytest.fixture
 def deck_para_abertura():
     deck = lord.Baralho()
-    base = {'number': 0}
+    base = {'number': 0,'type_code':'hero'}
     snowbourn = {
         'text': """Response: After Snowbourn Scout enters play, choose a location. 
             Place 1 progress token on that location.""",
@@ -110,7 +110,7 @@ def deck_para_abertura():
 
 @pytest.fixture
 def herois():
-    base = {'number': 0, 'text': ''}
+    base = {'number': 0, 'text': '', 'type_code': 'hero'}
     elfhelm = {
         'threat': 10,
         'willpower': 2,
@@ -156,7 +156,7 @@ def deck_de_missao():
     deck.
     """
     deck = lord.Baralho()
-    base = {'text':'', 'traits':'','number': 0}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'hero'}
     missao = base.copy()
     missao['text'] = texto
     deck.nova_carta(lord.Mission('Three is Company', **missao))
@@ -166,7 +166,7 @@ def deck_de_missao():
 
 @pytest.fixture
 def deck_de_encontro():
-    base = {'text':'', 'traits':'','number': 0}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'hero'}
     bagend = {
         'threat': 0,
         'quest_points': 3,
