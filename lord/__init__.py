@@ -130,6 +130,7 @@ class Evento(CartaJogador):
 class CartaCenario(Carta):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
+        self.força_ameaça = 0
 
 class Mission(CartaCenario):
     def __init__(self, nome, **kwargs):
@@ -138,7 +139,7 @@ class Mission(CartaCenario):
 class Localidade(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_ameaça = kwargs['threat']
+        self.força_ameaça = int(kwargs['threat'])
         self.pontos_missao = kwargs['quest_points']
         self.vitoria = kwargs['victory']
         self.conjunto_encontro = kwargs['encounter_set']
@@ -171,7 +172,7 @@ class Inimigo(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo_engajamento = kwargs['engage']
-        self.força_ameaça = kwargs['threat']
+        self.força_ameaça = int(kwargs['threat'])
         self.ataque = kwargs['attack']
         self.defesa = kwargs['defense']
         self.pontos_vida = kwargs['health']
@@ -237,6 +238,7 @@ class Jogador():
         self.hand = Mão()
         self.deck_de_compra = None
         self.deck_de_descarte = None
+        self.descarte = Baralho()
         self.herois_em_jogo = Area()
         self.mesa = Area()
         self.jogo: Jogo = None
@@ -370,6 +372,7 @@ class Jogo():
     FORA_DO_JOGO = 'FORA_DO_JOGO'
     AREA_DE_AMEACA = 'AREA_DE_AMEACA'
     LOCALIZACAO_ATIVA = 'LOCALIZACAO_ATIVA'
+    DESCARTE_ENCONTRO = 'DESCARTE_ENCONTRO'
 
     def __init__(self):
         self.jogadores = []
@@ -377,11 +380,32 @@ class Jogo():
         self.locais = {
             Jogo.DECK_DE_ENCONTRO : Baralho(),
             Jogo.DECK_DE_MISSAO : Baralho(),
+            Jogo.DESCARTE_ENCONTRO: Baralho(),
             Jogo.FORA_DO_JOGO : Area(),
             Jogo.AREA_DE_AMEACA : Area(),
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
         self.primeiro_jogador = None
+
+    def __repr__(self):
+        # TODO
+        texto = ''
+        texto += f'Ameaça da Área ({self.força_ameaça}): \n'
+        for carta in self.area_de_ameaca.cartas:
+            texto += f'\t{carta.nome} ({carta.tipo})'
+        texto += '\n'
+        texto += 'Localização Ativa:\n'
+        for carta in self.localizacao_ativa.cartas:
+            texto += f'\t{carta.nome}'
+        texto += '\n'
+        return texto
+
+    @property
+    def força_ameaça(self):
+        total = 0
+        for carta in self.area_de_ameaca.cartas:
+            total += carta.força_ameaça
+        return total
 
     @property
     def deck_de_missao(self):
@@ -466,6 +490,9 @@ class Colecao():
         for deck in self.decks:
             repr += f'{deck.id}) {deck.name}\n'
         return repr
+
+    def cenarios(self):
+        return list(CENARIOS_CONJUNTOS.keys())
 
     def pegar_deck_jogador(self, codigo):
         return loader.carregar_deck(codigo)
