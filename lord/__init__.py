@@ -14,6 +14,7 @@ class Carta():
         self.numero = args['number']
         self.tipo = args['type_code']
         self.virado = False
+        self.anexos = []
 
     def virar(self):
         self.virado = True
@@ -145,6 +146,20 @@ class Localidade(CartaCenario):
         self.conjunto_encontro = kwargs['encounter_set']
         self.efeito_sombrio = kwargs['shadow']
 
+    def __str__(self):
+        texto = ''
+        texto += f'{self.nome} ({self.tipo})\n'
+        texto += '------------\n'
+        texto += f'FA: {self.força_ameaça} PM: {self.pontos_missao}\n'
+        texto += f'Pontos de Vitória: {self.vitoria}\n'
+        texto += f'Atributos: {self.atributos}\n'
+        texto += '------------\n'
+        texto += f'{self.texto}\n'
+        if self.efeito_sombrio:
+            texto += '------------\n'
+            texto += f'{self.efeito_sombrio}\n'
+        return texto            
+    
 
 class Infortunio(CartaCenario):
     def __init__(self, nome, **kwargs):
@@ -374,7 +389,7 @@ class Jogo():
     LOCALIZACAO_ATIVA = 'LOCALIZACAO_ATIVA'
     DESCARTE_ENCONTRO = 'DESCARTE_ENCONTRO'
 
-    def __init__(self):
+    def __init__(self, colecao = None):
         self.jogadores = []
         self.nome_cenario = ''
         self.locais = {
@@ -386,18 +401,27 @@ class Jogo():
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
         self.primeiro_jogador = None
+        self.colecao = colecao
 
     def __repr__(self):
         # TODO
         texto = ''
-        texto += f'Ameaça da Área ({self.força_ameaça}): \n'
+        texto += f'Área de Ameaça ({self.força_ameaça}): \n'
         for carta in self.area_de_ameaca.cartas:
-            texto += f'\t{carta.nome} ({carta.tipo})'
+            texto += f'\t{carta.nome} ({carta.tipo})\n'
+            for anexo in carta.anexos:
+                texto += f'\t\t{anexo.nome} ({anexo.tipo})\n'
         texto += '\n'
         texto += 'Localização Ativa:\n'
         for carta in self.localizacao_ativa.cartas:
-            texto += f'\t{carta.nome}'
+            texto += f'\t{carta.nome}\n'
+            for anexo in carta.anexos:
+                texto += f'\t\t{anexo.nome} ({anexo.tipo})\n'            
         texto += '\n'
+        texto += 'Cartas fora do Jogo:\n'
+        print(self.fora_do_jogo.cartas)
+        for carta in self.fora_do_jogo.cartas:
+            texto += f'\t{carta.nome} ({carta.tipo})\n'
         return texto
 
     @property
@@ -405,6 +429,8 @@ class Jogo():
         total = 0
         for carta in self.area_de_ameaca.cartas:
             total += carta.força_ameaça
+            for anexo in carta.anexos:
+                total += anexo.força_ameaça
         return total
 
     @property
@@ -471,6 +497,7 @@ class Jogo():
         deck_destino = self.locais[destino]
         carta = deck_origem.retirar(nome_carta)
         deck_destino.nova_carta(carta)
+        return carta
 
     def embaralhar_deck_encontro(self):
         random.shuffle(self.deck_de_encontro.cartas)
@@ -479,6 +506,36 @@ class Jogo():
         preparacao = CENARIOS_CONJUNTOS[self.nome_cenario]['setup']
         preparacao(self)
 
+    def prepara_jogador(self, nome, codigo_deck):
+        jogador = self.novo_jogador(nome)
+        jogador.usar_decks(*self.colecao.pegar_deck_jogador(codigo_deck))
+        return jogador
+
+    def enfrentar_cenario(self, nome_cenario):
+        self.nome_cenario = nome_cenario
+        d1, d2 = loader.carregar_deck_cenario(nome_cenario)
+        self.deck_de_missao = d1
+        self.deck_de_encontro = d2
+        self.embaralhar_deck_encontro()
+
+    def ler(self, nome):
+        encontradas = []
+        for carta in self.area_de_ameaca.cartas:
+            if nome in carta.nome:
+                encontradas.append(carta)
+            for anexo in carta.anexos:
+                if nome in anexo.nome:
+                    encontradas.append(anexo)                
+        for jogador in self.jogadores:
+            for heroi in jogador.herois_em_jogo.cartas:
+                if nome in heroi.nome:
+                    encontradas.append(heroi)
+            for carta in jogador.mesa.cartas:
+                if nome in carta.nome:
+                    encontradas.append(carta)
+        for encontrada in encontradas:
+            print(encontrada)
+            print('------------------------\n')
 
 class Colecao():
 
@@ -496,10 +553,3 @@ class Colecao():
 
     def pegar_deck_jogador(self, codigo):
         return loader.carregar_deck(codigo)
-
-    def jogar(self, jogo, nome_cenario):
-        jogo.nome_cenario = nome_cenario
-        d1, d2 = loader.carregar_deck_cenario(nome_cenario)
-        jogo.deck_de_missao = d1
-        jogo.deck_de_encontro = d2
-        jogo.embaralhar_deck_encontro()

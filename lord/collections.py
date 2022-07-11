@@ -11,6 +11,17 @@ def journey_down_the_anduin(jogo):
         jogo.area_de_ameaca.cartas.append(carta)
     print('setup concluido.')
 
+def escape_from_dol_guldur(jogo):
+    gandalf = jogo.mover_carta("Gandalf's Map", jogo.DECK_DE_ENCONTRO, jogo.AREA_DE_AMEACA)
+    dungeon = jogo.mover_carta('Dungeon Torch', jogo.DECK_DE_ENCONTRO, jogo.AREA_DE_AMEACA)
+    shadow = jogo.mover_carta('Shadow Key', jogo.DECK_DE_ENCONTRO, jogo.AREA_DE_AMEACA)
+    jogo.mover_carta('Nazgûl of Dol Guldur', jogo.DECK_DE_ENCONTRO, jogo.FORA_DO_JOGO)
+    carta1 = jogo.deck_de_encontro.comprar()
+    gandalf.anexos.append(carta1)
+    carta2 = jogo.deck_de_encontro.comprar()
+    dungeon.anexos.append(carta2)
+    carta3 = jogo.deck_de_encontro.comprar()
+    shadow.anexos.append(carta3)
 
 CENARIOS_CONJUNTOS = {
     'Passage Through Mirkwood' : {
@@ -30,5 +41,13 @@ CENARIOS_CONJUNTOS = {
             "Wilderlands"
         ],
         'setup': journey_down_the_anduin
+    },
+    'Escape from Dol Guldur': {
+        'conjuntos': [
+            'Escape from Dol Guldur',
+            'Spiders of Mirkwood',
+            'Dol Guldur Orcs',
+        ],
+        'setup': escape_from_dol_guldur
     }
 }
