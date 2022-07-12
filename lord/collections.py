@@ -23,6 +23,13 @@ def escape_from_dol_guldur(jogo):
     carta3 = jogo.deck_de_encontro.comprar()
     shadow.anexos.append(carta3)
 
+def the_hunt_for_gollum(jogo):
+    for jogador in jogo.jogadores:
+        carta = jogo.deck_de_encontro.comprar()
+        print(f'{carta.nome} colocada na área de ameaça.')
+        jogo.area_de_ameaca.cartas.append(carta)
+    print('setup concluido.')
+
 CENARIOS_CONJUNTOS = {
     'Passage Through Mirkwood' : {
         'conjuntos':
@@ -49,5 +56,13 @@ CENARIOS_CONJUNTOS = {
             'Dol Guldur Orcs',
         ],
         'setup': escape_from_dol_guldur
-    }
+    },
+    'The Hunt for Gollum': {
+        'conjuntos': [
+            'The Hunt For Gollum',
+            'Journey Down the Anduin',
+            "Sauron's Reach",
+        ],
+        'setup': the_hunt_for_gollum
+    }    
 }

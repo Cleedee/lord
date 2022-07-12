@@ -2,6 +2,9 @@ import random
 from functools import reduce
 from collections import UserList
 
+from rich.console import Console
+from rich.table import Table
+
 from lord import repository as rep
 from lord import loader, utils, collections
 from lord.collections import CENARIOS_CONJUNTOS
@@ -67,11 +70,16 @@ class Hero(CartaJogador):
         self.recursos += 1
 
     def __repr__(self):
-        texto = ''
-        texto += f'Nome: {self.nome} ({self.custo_ameaça})\n'
-        texto += f'{self.atributos}\n'
-        texto += f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}'
-        return texto
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo_ameaça}) {self.esfera}')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        texto = f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
+        texto += f'Dano: {self.dano}'
+        table.add_row(texto)
+        table.add_row(f'{self.texto}')
+        console.print(table)
+        return ''
 
 
 class Acessorio(CartaJogador):
@@ -147,18 +155,22 @@ class Localidade(CartaCenario):
         self.efeito_sombrio = kwargs['shadow']
 
     def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
+
         texto = ''
-        texto += f'{self.nome} ({self.tipo})\n'
-        texto += '------------\n'
-        texto += f'FA: {self.força_ameaça} PM: {self.pontos_missao}\n'
-        texto += f'Pontos de Vitória: {self.vitoria}\n'
-        texto += f'Atributos: {self.atributos}\n'
-        texto += '------------\n'
-        texto += f'{self.texto}\n'
+        texto += f'[bold]Força de Ameaça:[/] {self.força_ameaça} [bold]Pontos de Missão:[/] {self.pontos_missao}\n'
+        texto += f'[bold]Pontos de Vitória:[/] {self.vitoria}\n'
+        texto += f'[bold]Atributos:[/] {self.atributos}\n'
+
+        table.add_row(texto)
+        table.add_row(self.texto)
+
         if self.efeito_sombrio:
-            texto += '------------\n'
-            texto += f'{self.efeito_sombrio}\n'
-        return texto            
+            table.add_row(f'[bold]Efeito Sombrio:[/] {self.efeito_sombrio}')
+        console.print(table)
+        return ''            
     
 
 class Infortunio(CartaCenario):
@@ -167,11 +179,34 @@ class Infortunio(CartaCenario):
         self.conjunto_encontro = kwargs['encounter_set']
         self.efeito_sombrio = kwargs['shadow']
 
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        table.add_row(f'{self.texto}')
+
+
+        if self.efeito_sombrio:
+            table.add_row(f'[bold]Efeito Sombrio:[/] {self.efeito_sombrio}')
+        console.print(table)
+        return ''                    
+
 class Objetivo(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.conjunto_encontro = kwargs['encounter_set']
         self.efeito_sombrio = kwargs['shadow']
+
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        table.add_row(f'{self.texto}')
+
+        console.print(table)
+        return ''
 
 class ObjetivoAliado(CartaCenario):
     def __init__(self, nome, **kwargs):
@@ -195,7 +230,24 @@ class Inimigo(CartaCenario):
         self.efeito_sombrio = kwargs['shadow']
         self.dano = 0
 
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
 
+        texto = ''
+        texto += f'[bold]Custo de Engajamento:[/] {self.custo_engajamento}\n'
+        texto += f'FA: {self.força_ameaça} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
+        texto += f'[bold]Dano:[/] {self.dano}\n'
+        texto += f'[bold]Atributos:[/] {self.atributos}'
+
+        table.add_row(texto)
+
+        table.add_row(f'{self.texto}')
+        if self.efeito_sombrio:
+            table.add_row(f'[bold]Efeito Sombrio:[/] {self.efeito_sombrio}')
+        console.print(table)
+        return ''
 
 class Baralho():
     def __init__(self):
@@ -346,6 +398,8 @@ class Jogador():
 
     @property
     def recursos(self):
+        console = Console()
+        table = Table(show_header=False)
         leadership = lore = spirit = tactics = 0
         for heroi in self.herois_em_jogo.cartas:
             if heroi.is_leadership:
@@ -356,13 +410,14 @@ class Jogador():
                 spirit += heroi.recursos
             if heroi.is_tactics:
                 tactics += heroi.recursos
-        texto = ''
-        texto += f'Leadership: {leadership}\n'
-        texto += f'Lore: {lore}\n'
-        texto += f'Spirit: {spirit}\n'
-        texto += f'Tactics: {tactics}'
-        print(texto)
-        return texto
+        table.add_column('Esfera')
+        table.add_column('Valor')
+        table.add_row('Leadership', str(leadership))
+        table.add_row('Lore', str(lore))
+        table.add_row('Spirit', str(spirit))
+        table.add_row('Tactics', str(tactics))
+        console.print(table)
+        return ''
 
     def _herois_em_linha(self):
         texto = ''
@@ -371,14 +426,17 @@ class Jogador():
         return texto
 
     def __repr__(self):
-        texto = '-------------------\n'
-        texto += f'Jogador: {self.nome}\n'
-        texto += f'Ameaça: {self.total_ameaça}\n'
-        texto += f'Pontos de Vitória: 0\n'
-        texto += f'Primeiro jogador: Sim\n'
-        texto += f'Herois: {self._herois_em_linha()}\n'
-        texto += '-------------------'
-        return texto
+        console = Console()
+        table = Table(show_header=False, header_style="bold magenta")
+        table.add_column("Campo")
+        table.add_column("Valor")
+        table.add_row('Jogador', str(self.nome))
+        table.add_row('Ameaça', str(self.total_ameaça))
+        table.add_row('Pontos de Vitória', '0')
+        table.add_row('Primeiro jogador', 'Sim')
+        table.add_row('Herois', self._herois_em_linha())
+        console.print(table)
+        return ''
 
 
 class Jogo():
@@ -405,24 +463,29 @@ class Jogo():
 
     def __repr__(self):
         # TODO
-        texto = ''
-        texto += f'Área de Ameaça ({self.força_ameaça}): \n'
+        console = Console()
+        table = Table('Áreas', show_header=False, show_lines=True, min_width=100)
+        table.add_row(f'ÁREA DE AMEAÇA ({self.força_ameaça})')
+        texto_area_ameaca = ''
         for carta in self.area_de_ameaca.cartas:
-            texto += f'\t{carta.nome} ({carta.tipo})\n'
+            texto_area_ameaca += f'\t{carta.nome} ({carta.tipo})\n'
             for anexo in carta.anexos:
-                texto += f'\t\t{anexo.nome} ({anexo.tipo})\n'
-        texto += '\n'
-        texto += 'Localização Ativa:\n'
+                texto_area_ameaca += f'\t\t{anexo.nome} ({anexo.tipo})\n'
+        table.add_row(texto_area_ameaca)
+        table.add_row('LOCALIZAÇÃO ATIVA')
+        texto_localizacao_ativa = ''
         for carta in self.localizacao_ativa.cartas:
-            texto += f'\t{carta.nome}\n'
+            texto_localizacao_ativa += f'\t{carta.nome}\n'
             for anexo in carta.anexos:
-                texto += f'\t\t{anexo.nome} ({anexo.tipo})\n'            
-        texto += '\n'
-        texto += 'Cartas fora do Jogo:\n'
-        print(self.fora_do_jogo.cartas)
+                texto_localizacao_ativa += f'\t\t{anexo.nome} ({anexo.tipo})\n'
+        table.add_row(texto_localizacao_ativa)
+        table.add_row('CARTAS FORA DE JOGO')
+        texto_fora_jogo = ''
         for carta in self.fora_do_jogo.cartas:
-            texto += f'\t{carta.nome} ({carta.tipo})\n'
-        return texto
+            texto_fora_jogo += f'\t{carta.nome} ({carta.tipo})\n'
+        table.add_row(texto_fora_jogo)
+        console.print(table)
+        return ''
 
     @property
     def força_ameaça(self):
@@ -533,9 +596,11 @@ class Jogo():
             for carta in jogador.mesa.cartas:
                 if nome in carta.nome:
                     encontradas.append(carta)
+            for carta in jogador.mão:
+                if nome in carta.nome:
+                    encontradas.append(carta)
         for encontrada in encontradas:
             print(encontrada)
-            print('------------------------\n')
 
 class Colecao():
 
@@ -543,10 +608,12 @@ class Colecao():
         self.decks = rep.encontra_decks()
 
     def __repr__(self):
-        repr = ''
+        console = Console()
+        table = Table('Código', 'Nome', show_header=False, show_lines=True)
         for deck in self.decks:
-            repr += f'{deck.id}) {deck.name}\n'
-        return repr
+            table.add_row(str(deck.id), deck.name)
+        console.print(table)
+        return ''
 
     def cenarios(self):
         return list(CENARIOS_CONJUNTOS.keys())
