@@ -307,6 +307,41 @@ class Area(Baralho):
             repr += f'{carta.nome}\n'
         return repr
 
+class AreaAmeaça(Area):
+    def __init__(self, jogo=None):
+        super().__init__()
+        self.jogo = jogo
+
+    def mover_para_localizacao_ativa(self, nome):
+        self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.LOCALIZACAO_ATIVA)
+
+    def mover_para_descarte(self, nome):
+        self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.DESCARTE_ENCONTRO)
+
+class DeckEncontro(Baralho):
+    def __init__(self, jogo=None):
+        super().__init__()
+        self.jogo = jogo
+
+    def mover_para_area_de_ameaça(self, nome):
+        self.jogo.comprar(nome)
+
+    def mover_para_descarte(self, nome):
+        self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.DESCARTE_ENCONTRO)
+
+    def mover_para_fora_do_jogo(self, nome):
+        self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.FORA_DO_JOGO)
+
+    def embaralhar(self):
+        random.shuffle(self.cartas)
+
+class ForaDoJogo(Area):
+    def __init__(self, jogo=None):
+        super().__init__()
+        self.jogo = jogo
+
+    def mover_para_deck_de_encontro(self, nome):
+        self.jogo.mover_carta(nome, Jogo.FORA_DO_JOGO, Jogo.DECK_DE_ENCONTRO)
 
 class Mão(UserList):
     def index(self, valor):
@@ -494,18 +529,17 @@ class Jogo():
         self.jogadores = []
         self.nome_cenario = ''
         self.locais = {
-            Jogo.DECK_DE_ENCONTRO : Baralho(),
+            Jogo.DECK_DE_ENCONTRO : DeckEncontro(self),
             Jogo.DECK_DE_MISSAO : Baralho(),
             Jogo.DESCARTE_ENCONTRO: Baralho(),
-            Jogo.FORA_DO_JOGO : Area(),
-            Jogo.AREA_DE_AMEACA : Area(),
+            Jogo.FORA_DO_JOGO : ForaDoJogo(),
+            Jogo.AREA_DE_AMEACA : AreaAmeaça(self),
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
         self.primeiro_jogador = None
         self.colecao = colecao
 
     def __repr__(self):
-        # TODO
         console = Console()
         table = Table('Áreas', show_header=False, show_lines=True, min_width=100)
         table.add_row(f'ÁREA DE AMEAÇA ({self.força_ameaça})')
@@ -608,7 +642,7 @@ class Jogo():
     def comprar(self):
         carta = self.deck_de_encontro.comprar()
         self.area_de_ameaca.cartas.append(carta)
-        print(f'{carta.nome}' foi adicionada à Área de Ameaça.)
+        print(f'{carta.nome} foi adicionada à Área de Ameaça.')
         if carta.is_treachery:
             print(f'{carta.nome} é um infortúnio. Resolva.')
 

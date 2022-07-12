@@ -30,6 +30,21 @@ def the_hunt_for_gollum(jogo):
         jogo.area_de_ameaca.cartas.append(carta)
     print('setup concluido.')
 
+def conflict_at_the_carrock(jogo):
+    jogo.mover_carta('The Carrock', jogo.DECK_DE_ENCONTRO, jogo.AREA_DE_AMEACA)
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Sacked!')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Sacked!')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Sacked!')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Sacked!')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Morris')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Louis')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Rupert')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Stuart')
+    for jogador in jogo.jogadores:
+        jogo.fora_do_jogo.mover_para_deck_de_encontro('Sacked!')
+    jogo.deck_de_encontro.embaralhar()
+    print('setup concluido.')
+
 CENARIOS_CONJUNTOS = {
     'Passage Through Mirkwood' : {
         'conjuntos':
