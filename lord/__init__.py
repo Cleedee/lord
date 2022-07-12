@@ -141,6 +141,26 @@ class CartaCenario(Carta):
         super().__init__(nome, **kwargs)
         self.força_ameaça = 0
 
+    @property
+    def is_location(self):
+        return True if self.tipo == 'location' else False
+
+    @property
+    def is_enemy(self):
+        return True if self.tipo == 'enemy' else False
+
+    @property
+    def is_treachery(self):
+        return True if self.tipo == 'treachery' else False
+
+    @property
+    def is_objective(self):
+        return True if self.tipo == 'objective' else False
+
+    @property
+    def is_objective_ally(self):
+        return True if self.tipo == 'objective_ally' else False
+
 class Mission(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
@@ -320,6 +340,39 @@ class Jogador():
         self.deck_de_compra.cartas = self.deck_de_jogador.cartas[:]
         self.total_ameaça = self.ameaça_inicial
 
+
+    @property
+    def leadership(self):
+        total = 0
+        for heroi in self.herois_em_jogo.cartas:
+            if heroi.is_leadership:
+                total += heroi.recursos
+        return total
+
+    @property
+    def lore(self):
+        total = 0
+        for heroi in self.herois_em_jogo.cartas:
+            if heroi.is_lore:
+                total += heroi.recursos
+        return total
+
+    @property
+    def spirit(self):
+        total = 0
+        for heroi in self.herois_em_jogo.cartas:
+            if heroi.is_spirit:
+                total += heroi.recursos
+        return total
+
+    @property
+    def tactics(self):
+        total = 0
+        for heroi in self.herois_em_jogo.cartas:
+            if heroi.is_tactics:
+                total += heroi.recursos
+        return total
+
     @property
     def mão(self):
         return self.hand
@@ -400,22 +453,12 @@ class Jogador():
     def recursos(self):
         console = Console()
         table = Table(show_header=False)
-        leadership = lore = spirit = tactics = 0
-        for heroi in self.herois_em_jogo.cartas:
-            if heroi.is_leadership:
-                leadership += heroi.recursos
-            if heroi.is_lore:
-                lore += heroi.recursos
-            if heroi.is_spirit:
-                spirit += heroi.recursos
-            if heroi.is_tactics:
-                tactics += heroi.recursos
         table.add_column('Esfera')
         table.add_column('Valor')
-        table.add_row('Leadership', str(leadership))
-        table.add_row('Lore', str(lore))
-        table.add_row('Spirit', str(spirit))
-        table.add_row('Tactics', str(tactics))
+        table.add_row('Leadership', str(self.leadership))
+        table.add_row('Lore', str(self.lore))
+        table.add_row('Spirit', str(self.spirit))
+        table.add_row('Tactics', str(self.tactics))
         console.print(table)
         return ''
 
@@ -561,6 +604,13 @@ class Jogo():
         carta = deck_origem.retirar(nome_carta)
         deck_destino.nova_carta(carta)
         return carta
+
+    def comprar(self):
+        carta = self.deck_de_encontro.comprar()
+        self.area_de_ameaca.cartas.append(carta)
+        print(f'{carta.nome}' foi adicionada à Área de Ameaça.)
+        if carta.is_treachery:
+            print(f'{carta.nome} é um infortúnio. Resolva.')
 
     def embaralhar_deck_encontro(self):
         random.shuffle(self.deck_de_encontro.cartas)

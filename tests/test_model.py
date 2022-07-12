@@ -287,12 +287,8 @@ def test_total_recursos(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     jogo.jogador1.adicionar_recursos()
-    texto = ''
-    texto += 'Leadership: 2\n'
-    texto += 'Lore: 0\n'
-    texto += 'Spirit: 1\n'
-    texto += 'Tactics: 0'
-    assert jogo.jogador1.recursos == texto
+    assert jogo.jogador1.leadership == 2
+    assert jogo.jogador1.spirit == 1
 
 def test_ver_primeira_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
