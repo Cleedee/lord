@@ -3,8 +3,6 @@ from typing import List
 import re
 import json
 
-import pandas as pd
-
 from lord.database import Slot, Deck, Game, Scenario, Card
 from lord.scrap import pegar_carta_jogador
 import lord
@@ -36,113 +34,7 @@ def somente_tesouros(slots: List[Slot]) -> List[Slot]:
 def remover_tags(texto):
     return TAG_RE.sub('', texto)
 
-def importar_cenarios():
-    df = pd.read_excel('lord/data/cartas.xls')
-    df['WP'] = pd.to_numeric(df['WP'], errors='coerce')
-    df['WP'] = df['WP'].fillna(0)
-    #df['WP'] = df['WP'].astype(int)
-    tipos = "Type in ['Enemy','Quest','Location','Treachery','Objective','Objective - Ally']"
-    campos = [
-        'Number', 'Name', 'Type', 'Unique', 'Text', 'Shadow','Abbr','Threat',
-        'Traits','Keywords', 'WP', 'HP', 'ATK', 'DEF', 'Cycle', 'Encounter Set', 'Q#',
-        'Quest', 'Notes', 'Link', 'Count', 'Box', 'Engage', 'Victory'
-    ]
-    df_scenario = df.query(tipos)[campos]
-    type_codes = {
-        'Enemy':'enemy',
-        'Quest':'quest',
-        'Location':'location',
-        'Treachery':'treachery',
-        'Objective':'objective',
-        'Objective - Ally':'objective_ally',
-    }
-    for carta in df_scenario.to_dict('records'):
-        scenario = Scenario(
-            type_code = type_codes[carta['Type']],
-            type_name = carta['Type'],
-            number = int(carta['Number']),
-            name = carta['Name'],
-            is_unique = True if carta['Unique'] == 'Unique' else False,
-            text = carta['Text'],
-            shadow = carta['Shadow'],
-            pack_code = carta['Abbr'],
-            pack_name = carta['Box'],
-            threat = carta['Threat'],
-            traits = carta['Traits'],
-            keywords = carta['Keywords'],
-            willpower = int(carta['WP']),
-            attack = carta['ATK'],
-            defense = carta['DEF'],
-            health = carta['HP'],
-            cycle = carta['Cycle'],
-            encounter_set = carta['Encounter Set'],
-            quest_points = carta['Quest'],
-            victory = carta['Victory'],
-            sequence = carta['Q#'],
-            notes = carta['Notes'],
-            count = carta['Count'],
-            engage = carta['Engage']
-        )
-        print('Salvando {}'.format(scenario.name))
-        rep.salva_scenario(scenario)
-        print('Salvo.')
-    print('Importação realizada com sucesso.')
 
-
-def converte_excel_para_json():
-    df = pd.read_excel('lord/data/cartas.xls')
-    df['WP'] = pd.to_numeric(df['WP'], errors='coerce')
-    df['WP'] = df['WP'].fillna(0)
-    tipos = "Type in ['Enemy','Quest','Location','Treachery','Objective','Objective - Ally']"
-    campos = [
-        'Number', 'Name', 'Type', 'Unique', 'Text', 'Shadow','Abbr','Threat',
-        'Traits','Keywords', 'WP', 'HP', 'ATK', 'DEF', 'Cycle', 'Encounter Set', 'Q#',
-        'Quest', 'Notes', 'Link', 'Count', 'Box', 'Engage', 'Victory'
-    ]
-    df_scenario = df.query(tipos)[campos]
-    type_codes = {
-        'Enemy':'enemy',
-        'Quest':'quest',
-        'Location':'location',
-        'Treachery':'treachery',
-        'Objective':'objective',
-        'Objective - Ally':'objective_ally',
-    }
-    df_scenario.columns = [
-        'number', 
-        'name',
-        'type_name',
-        'unique',
-        'text',
-        'shadow',
-        'pack_code',
-        'threat',
-        'traits',
-        'keywords',
-        'willpower',
-        'health',
-        'attack',
-        'defense',
-        'cycle',
-        'encounter_set',
-        'sequence',
-        'quest_points',
-        'notes',
-        'link',
-        'count',
-        'pack_name',
-        'engage',
-        'victory'
-    ]
-    # TODO criar o campo type_code
-    df_scenario['type_code'] = df_scenario.apply(lambda linha: type_codes[linha.type_name], axis=1)
-    # TODo criar o campo is_unique
-    df_scenario['is_unique'] = df_scenario.apply(lambda linha: True if linha.unique == 'Unique' else False, axis=1)
-
-    result = df_scenario.to_json(orient="records")
-    parsed = json.loads(result)
-    with open('json_data.json', 'w') as outfile:
-        outfile.write(json.dumps(parsed, indent=4))
 
 def carta_para_dicionario(card: Card) -> dict:
     return {
