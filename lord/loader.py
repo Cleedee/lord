@@ -3,6 +3,7 @@ from . import repository as rep
 from . import database
 from . import utils
 from . import collections
+from . import jsonqueries
 
 def carrega_deck_jogador(codigo):
     deck = rep.encontra_deck(codigo)
@@ -34,19 +35,17 @@ def carregar_deck(codigo):
     return (deck_herois, deck_jogador)
 
 def carregar_deck_cenario(nome):
-    deck_missao = lord.Baralho()
-    deck_encontro = lord.Baralho()
+    deck_missao = lord.DeckDeMissao()
+    deck_encontro = lord.DeckEncontro()
     cartas = []
     for conjunto in collections.CENARIOS_CONJUNTOS[nome]['conjuntos']:
-        cartas.extend(rep.encontra_cartas_conjunto_por_nome(conjunto))
+        cartas.extend(jsonqueries.encontra_cartas_conjunto_por_nome(conjunto))
     for carta in cartas:
-        campos = utils.carta_cenario_para_dicionario(carta)
-        if carta.type_code == 'quest':
-            deck_missao.nova_carta(lord.Mission(carta.name, **campos))
+        print(carta['text'])
+        if carta['type_code'] == 'quest':
+            deck_missao.nova_carta(lord.Mission(carta['name'], **carta))
         else:
             ClasseCarta = utils.pegar_classe_da_carta_cenario(carta)
-            for i in range(int(float(carta.count))):
-                deck_encontro.nova_carta(ClasseCarta(carta.name, **campos))
-    print(deck_missao.total)
-    print(deck_encontro.total)
+            for i in range(int(float(carta['count']))):
+                deck_encontro.nova_carta(ClasseCarta(carta['name'], **carta))
     return (deck_missao, deck_encontro)

@@ -18,7 +18,7 @@ def deck_de_missao_conflict_at_the_carrock():
     back into the encounter deck.
     """
     deck = lord.Baralho()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest'}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 'sequence': '1.0'}
     missao = base.copy()
     missao['text'] = texto
     deck.nova_carta(lord.Mission("Grimbeorn's Quest", **missao))

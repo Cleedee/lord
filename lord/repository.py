@@ -33,8 +33,12 @@ def encontra_slots(slot_type, deck_id) -> List[Slot]:
         (Slot.deck == deck_id)
     )
 
+def encontra_carta_cenario_por_nome(nome):
+    return Scenario.select().where(Scenario.name.contains(nome))
+
 def encontra_cartas_conjunto_por_nome(nome):
     return Scenario.select().where(Scenario.encounter_set == nome)
+
 
 def _salva_slot(slot_type, slots, deck):
     for code_card in slots:

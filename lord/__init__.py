@@ -12,8 +12,8 @@ from lord.collections import CENARIOS_CONJUNTOS
 class Carta():
     def __init__(self, nome, **args):
         self.nome = nome
-        self.texto =  utils.remover_tags(args['text'])
-        self.atributos= args['traits']
+        self.texto =  utils.remover_tags(args['text']) if args['text'] else ''
+        self.atributos= args['traits'] if args['traits'] else ''
         self.numero = args['number']
         self.tipo = args['type_code']
         self.virado = False
@@ -164,6 +164,7 @@ class CartaCenario(Carta):
 class Mission(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
+        self.sequencia = int(float(kwargs['sequence']))
 
 class Localidade(CartaCenario):
     def __init__(self, nome, **kwargs):
@@ -313,10 +314,12 @@ class AreaAmeaça(Area):
         self.jogo = jogo
 
     def mover_para_localizacao_ativa(self, nome):
-        self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.LOCALIZACAO_ATIVA)
+        print(f'{nome} agora é a localização ativa.')
+        return self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.LOCALIZACAO_ATIVA)
 
     def mover_para_descarte(self, nome):
-        self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.DESCARTE_ENCONTRO)
+        print(f'{nome} foi descartada.')
+        return self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.DESCARTE_ENCONTRO)
 
 class DeckEncontro(Baralho):
     def __init__(self, jogo=None):
@@ -324,16 +327,32 @@ class DeckEncontro(Baralho):
         self.jogo = jogo
 
     def mover_para_area_de_ameaça(self, nome):
-        self.jogo.comprar(nome)
+        print(f'{nome} foi adicionada à área de ameaça.')
+        return self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.AREA_DE_AMEACA)
 
     def mover_para_descarte(self, nome):
-        self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.DESCARTE_ENCONTRO)
+        print(f'{nome} foi descartada.')
+        return self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.DESCARTE_ENCONTRO)
 
     def mover_para_fora_do_jogo(self, nome):
-        self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.FORA_DO_JOGO)
+        print(f'{nome} foi posta fora do jogo.')
+        return self.jogo.mover_carta(nome, Jogo.DECK_DE_ENCONTRO,Jogo.FORA_DO_JOGO)
 
     def embaralhar(self):
+        print('Deck embaralhado.')
         random.shuffle(self.cartas)
+
+class DeckDeMissao(Baralho):
+    def __init__(self, jogo=None):
+        super().__init__()
+        self.jogo = jogo
+
+    def cartas_da_sequencia(self, sequencia):
+        encontradas = []
+        for carta in self.cartas:
+            if carta.sequencia == sequencia:
+                encontradas.append(carta)
+        return encontradas
 
 class ForaDoJogo(Area):
     def __init__(self, jogo=None):
@@ -341,7 +360,8 @@ class ForaDoJogo(Area):
         self.jogo = jogo
 
     def mover_para_deck_de_encontro(self, nome):
-        self.jogo.mover_carta(nome, Jogo.FORA_DO_JOGO, Jogo.DECK_DE_ENCONTRO)
+        print(f'{nome} foi colocada na área de ameaça.')
+        return self.jogo.mover_carta(nome, Jogo.FORA_DO_JOGO, Jogo.DECK_DE_ENCONTRO)
 
 class Mão(UserList):
     def index(self, valor):
@@ -530,18 +550,24 @@ class Jogo():
         self.nome_cenario = ''
         self.locais = {
             Jogo.DECK_DE_ENCONTRO : DeckEncontro(self),
-            Jogo.DECK_DE_MISSAO : Baralho(),
+            Jogo.DECK_DE_MISSAO : DeckDeMissao(self),
             Jogo.DESCARTE_ENCONTRO: Baralho(),
-            Jogo.FORA_DO_JOGO : ForaDoJogo(),
+            Jogo.FORA_DO_JOGO : ForaDoJogo(self),
             Jogo.AREA_DE_AMEACA : AreaAmeaça(self),
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
         self.primeiro_jogador = None
+        self.missao_atual = None
         self.colecao = colecao
+        
 
     def __repr__(self):
         console = Console()
         table = Table('Áreas', show_header=False, show_lines=True, min_width=100)
+        if self.missao_atual:
+            table.add_row(f'MISSÃO: {self.missao_atual.nome} [{self.missao_atual.sequencia}]')
+        else:
+            table.add_row(f'MISSÃO: ')
         table.add_row(f'ÁREA DE AMEAÇA ({self.força_ameaça})')
         texto_area_ameaca = ''
         for carta in self.area_de_ameaca.cartas:
@@ -645,6 +671,7 @@ class Jogo():
         print(f'{carta.nome} foi adicionada à Área de Ameaça.')
         if carta.is_treachery:
             print(f'{carta.nome} é um infortúnio. Resolva.')
+        return carta
 
     def embaralhar_deck_encontro(self):
         random.shuffle(self.deck_de_encontro.cartas)
@@ -652,6 +679,8 @@ class Jogo():
     def setup(self):
         preparacao = CENARIOS_CONJUNTOS[self.nome_cenario]['setup']
         preparacao(self)
+        q1 = self.deck_de_missao.cartas_da_sequencia(1)[0]
+        self.missao_atual = q1
 
     def prepara_jogador(self, nome, codigo_deck):
         jogador = self.novo_jogador(nome)
@@ -663,6 +692,7 @@ class Jogo():
         d1, d2 = loader.carregar_deck_cenario(nome_cenario)
         self.deck_de_missao = d1
         self.deck_de_encontro = d2
+        self.deck_de_encontro.jogo = self
         self.embaralhar_deck_encontro()
 
     def ler(self, nome):
@@ -672,7 +702,13 @@ class Jogo():
                 encontradas.append(carta)
             for anexo in carta.anexos:
                 if nome in anexo.nome:
-                    encontradas.append(anexo)                
+                    encontradas.append(anexo)
+        for carta in self.fora_do_jogo.cartas:
+            if nome in carta.nome:
+                encontradas.append(carta)
+        for carta in self.localizacao_ativa.cartas:
+            if nome in carta.nome:
+                encontradas.append(carta)                
         for jogador in self.jogadores:
             for heroi in jogador.herois_em_jogo.cartas:
                 if nome in heroi.nome:

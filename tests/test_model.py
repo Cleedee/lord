@@ -156,7 +156,7 @@ def deck_de_missao():
     deck.
     """
     deck = lord.Baralho()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest'}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 'sequence': '1.0'}
     missao = base.copy()
     missao['text'] = texto
     deck.nova_carta(lord.Mission('Three is Company', **missao))
