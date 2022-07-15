@@ -2,7 +2,7 @@ import lord
 from . import repository as rep
 from . import database
 from . import utils
-from . import collections
+from . import packs
 from . import jsonqueries
 
 def carrega_deck_jogador(codigo):
@@ -38,7 +38,7 @@ def carregar_deck_cenario(nome):
     deck_missao = lord.DeckDeMissao()
     deck_encontro = lord.DeckEncontro()
     cartas = []
-    for conjunto in collections.CENARIOS_CONJUNTOS[nome]['conjuntos']:
+    for conjunto in packs.CENARIOS_CONJUNTOS[nome]['conjuntos']:
         cartas.extend(jsonqueries.encontra_cartas_conjunto_por_nome(conjunto))
     for carta in cartas:
         if carta['type_code'] == 'quest':

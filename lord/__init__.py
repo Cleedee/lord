@@ -7,8 +7,8 @@ from rich.console import Console
 from rich.table import Table
 
 from lord import repository as rep
-from lord import loader, utils, collections
-from lord.collections import CENARIOS_CONJUNTOS
+from lord import loader, utils
+from lord.packs import CENARIOS_CONJUNTOS
 
 class Carta():
     def __init__(self, nome, **args):
