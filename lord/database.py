@@ -27,6 +27,8 @@ class Card(Model):
     url = CharField(default=False)
     imagesrc = CharField(default='')
     cost = CharField(default=None,null=True)
+    victory = IntegerField(default=0)
+    quest = IntegerField(default=0)
 
     class Meta:
         database = db

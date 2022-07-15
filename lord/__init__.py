@@ -1,6 +1,7 @@
 import random
 from functools import reduce
 from collections import UserList
+from urllib.parse import urlparse
 
 from rich.console import Console
 from rich.table import Table
@@ -89,14 +90,16 @@ class Acessorio(CartaJogador):
         self.custo = kwargs['cost']
 
     def __str__(self):
-        texto = ''
-        texto += f'{self.nome} ({self.tipo})\n'
-        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
-        texto += '------------\n'
-        texto += f'Atributos: {self.atributos}\n'
-        texto += '------------\n'
-        texto += f'{self.texto}\n'
-        return texto
+
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
+        table.add_row(f'[bold]Esfera:[/] {self.esfera}')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        table.add_row(f'{self.texto}')
+        console.print(table)
+        return ''
+
 
 class Aliado(CartaJogador):
 
@@ -110,16 +113,18 @@ class Aliado(CartaJogador):
         self.dano = 0
 
     def __str__(self):
-        texto = ''
-        texto += f'{self.nome} ({self.tipo})\n'
-        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
-        texto += f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
-        texto += f'Dano: {self.dano}\n'
-        texto += '------------\n'
-        texto += f'Atributos: {self.atributos}\n'
-        texto += '------------\n'
-        texto += f'{self.texto}\n'
-        return texto
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
+        table.add_row(f'[bold]Esfera:[/] {self.esfera}')
+        texto = f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}'
+        table.add_row(texto)
+        table.add_row(f'Dano: {self.dano}')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        table.add_row(f'{self.texto}')
+        console.print(table)
+        return ''
+
 
 class Evento(CartaJogador):
     def __init__(self, nome, **kwargs):
@@ -127,14 +132,36 @@ class Evento(CartaJogador):
         self.custo = kwargs['cost']
 
     def __str__(self):
-        texto = ''
-        texto += f'{self.nome} ({self.tipo})\n'
-        texto += f'Esfera/Custo: {self.esfera} / {self.custo}\n'
-        texto += '------------\n'
-        texto += f'Atributos: {self.atributos}\n'
-        texto += '------------\n'
-        texto += f'{self.texto}\n'
-        return texto
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
+        table.add_row(f'[bold]Esfera:[/] {self.esfera}')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+        table.add_row(f'{self.texto}')
+        console.print(table)
+        return ''
+
+# Player Side Quest
+class MissaoParalela(CartaJogador):
+
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+        self.custo = kwargs['cost']
+        self.vitoria = kwargs['victory'] if kwargs['victory'] else 0
+        self.pontos_missao = kwargs['quest'] if kwargs['quest'] else 0
+
+    def __repr__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
+        table.add_row(f'[bold]Atributos:[/] {self.atributos}')
+
+        table.add_row(f'[bold]Pontos de Missão:[/] {self.pontos_missao}')
+        table.add_row(f'{self.texto}')
+        table.add_row(f'[bold]Vitória:[/] {self.vitoria}')
+        console.print(table)
+        return ''
+
 
 class CartaCenario(Carta):
     def __init__(self, nome, **kwargs):
@@ -171,7 +198,7 @@ class Localidade(CartaCenario):
         super().__init__(nome, **kwargs)
         self.força_ameaça = int(kwargs['threat'])
         self.pontos_missao = kwargs['quest_points']
-        self.vitoria = kwargs['victory']
+        self.vitoria = kwargs['victory'] if kwargs['victory'] else ''
         self.conjunto_encontro = kwargs['encounter_set']
         self.efeito_sombrio = kwargs['shadow']
 
@@ -719,6 +746,8 @@ class Jogo():
             for carta in jogador.mão:
                 if nome in carta.nome:
                     encontradas.append(carta)
+        if self.missao_atual and nome in self.missao_atual.nome:
+            encontradas.append(carta)
         for encontrada in encontradas:
             print(encontrada)
 
@@ -740,3 +769,11 @@ class Colecao():
 
     def pegar_deck_jogador(self, codigo):
         return loader.carregar_deck(codigo)
+
+    def baixar_deck_jogador(self, url):
+        partes = urlparse(url)
+        codigo = partes.path.strip('/').split('/')[2]
+        rep.salva_deck(codigo)
+
+    def atualizar_lista_decks(self):
+        self.decks = rep.encontra_decks()

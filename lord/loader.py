@@ -41,7 +41,6 @@ def carregar_deck_cenario(nome):
     for conjunto in collections.CENARIOS_CONJUNTOS[nome]['conjuntos']:
         cartas.extend(jsonqueries.encontra_cartas_conjunto_por_nome(conjunto))
     for carta in cartas:
-        print(carta['text'])
         if carta['type_code'] == 'quest':
             deck_missao.nova_carta(lord.Mission(carta['name'], **carta))
         else:

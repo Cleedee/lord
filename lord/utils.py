@@ -58,7 +58,9 @@ def carta_para_dicionario(card: Card) -> dict:
         'has_errata': card.has_errata,
         'url': card.url,
         'imagesrc': card.imagesrc,
-        'cost': card.cost
+        'cost': card.cost,
+        'victory': card.victory,
+        'quest': card.quest
     }
 
 
@@ -71,6 +73,8 @@ def pegar_classe_da_carta_jogador(carta: Card):
         return lord.Evento
     elif carta.type_code == 'attachment':
         return lord.Acessorio
+    elif carta.type_code == 'player-side-quest':
+        return lord.MissaoParalela
     else:
         raise Exception("Esse carta não é de jogador ou não configurada ");
 
