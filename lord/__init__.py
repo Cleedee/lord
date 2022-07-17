@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 from rich.console import Console
 from rich.table import Table
+from rich.markup import escape
 
 from lord import repository as rep
 from lord import loader, utils
@@ -78,7 +79,7 @@ class Hero(CartaJogador):
         texto = f'FV: {self.força_vontade} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
         texto += f'Dano: {self.dano}'
         table.add_row(texto)
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         console.print(table)
         return ''
 
@@ -96,7 +97,7 @@ class Acessorio(CartaJogador):
         table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
         table.add_row(f'[bold]Esfera:[/] {self.esfera}')
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         console.print(table)
         return ''
 
@@ -121,7 +122,7 @@ class Aliado(CartaJogador):
         table.add_row(texto)
         table.add_row(f'Dano: {self.dano}')
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         console.print(table)
         return ''
 
@@ -137,7 +138,7 @@ class Evento(CartaJogador):
         table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
         table.add_row(f'[bold]Esfera:[/] {self.esfera}')
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         console.print(table)
         return ''
 
@@ -157,7 +158,7 @@ class MissaoParalela(CartaJogador):
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
 
         table.add_row(f'[bold]Pontos de Missão:[/] {self.pontos_missao}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         table.add_row(f'[bold]Vitória:[/] {self.vitoria}')
         console.print(table)
         return ''
@@ -192,11 +193,22 @@ class Mission(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
         self.sequencia = int(float(kwargs['sequence']))
+        self.pontos_missao = kwargs['quest_points']
+
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
+        table.add_row(f'[bold]Pontos de Missão:[/] {self.pontos_missao}')
+        table.add_row(f'{escape(self.texto)}')
+
+        console.print(table)
+        return ''            
 
 class Localidade(CartaCenario):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_ameaça = int(kwargs['threat'])
+        self.força_ameaça = kwargs['threat']
         self.pontos_missao = kwargs['quest_points']
         self.vitoria = kwargs['victory'] if kwargs['victory'] else ''
         self.conjunto_encontro = kwargs['encounter_set']
@@ -213,7 +225,7 @@ class Localidade(CartaCenario):
         texto += f'[bold]Atributos:[/] {self.atributos}\n'
 
         table.add_row(texto)
-        table.add_row(self.texto)
+        table.add_row(f'{escape(self.texto)}')
 
         if self.efeito_sombrio:
             table.add_row(f'[bold]Efeito Sombrio:[/] {self.efeito_sombrio}')
@@ -232,7 +244,7 @@ class Infortunio(CartaCenario):
         table = Table(show_header=False, show_lines=True)
         table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
 
 
         if self.efeito_sombrio:
@@ -251,7 +263,7 @@ class Objetivo(CartaCenario):
         table = Table(show_header=False, show_lines=True)
         table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
         table.add_row(f'[bold]Atributos:[/] {self.atributos}')
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
 
         console.print(table)
         return ''
@@ -291,7 +303,7 @@ class Inimigo(CartaCenario):
 
         table.add_row(texto)
 
-        table.add_row(f'{self.texto}')
+        table.add_row(f'{escape(self.texto)}')
         if self.efeito_sombrio:
             table.add_row(f'[bold]Efeito Sombrio:[/] {self.efeito_sombrio}')
         console.print(table)
@@ -507,8 +519,15 @@ class Jogador():
         random.shuffle(self.deck_de_compra.cartas)
 
     def comprar_mão_inicial(self):
-        self.hand = Mão(self.deck_de_compra.cartas[0:6])
-        self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
+        if self.jogo.jogador_inicial:
+            self.hand = Mão(self.deck_de_compra.cartas[0:6])
+            self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
+        elif len(self.jogo.jogadores) == 1:
+            self.jogo.jogador_inicial = self
+            self.hand = Mão(self.deck_de_compra.cartas[0:6])
+            self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
+        else:
+            print('Antes, determine o jogador inicial.')
 
     def comprar(self):
         self.hand.extend(self.deck_de_compra.cartas[0:1])
@@ -558,7 +577,7 @@ class Jogador():
         table.add_row('Jogador', str(self.nome))
         table.add_row('Ameaça', str(self.total_ameaça))
         table.add_row('Pontos de Vitória', '0')
-        table.add_row('Primeiro jogador', 'Sim')
+        table.add_row('Jogador Inicial', 'Sim' if self.jogo.jogador_inicial == self else 'Não')
         table.add_row('Herois', self._herois_em_linha())
         console.print(table)
         return ''
@@ -583,7 +602,7 @@ class Jogo():
             Jogo.AREA_DE_AMEACA : AreaAmeaça(self),
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
-        self.primeiro_jogador = None
+        self.jogador_inicial = None
         self.missao_atual = None
         self.colecao = colecao
         
@@ -621,7 +640,7 @@ class Jogo():
     def força_ameaça(self):
         total = 0
         for carta in self.area_de_ameaca.cartas:
-            total += carta.força_ameaça
+            total += int(carta.força_ameaça) if carta.força_ameaça.isdigit() else 0
             for anexo in carta.anexos:
                 total += anexo.força_ameaça
         return total
@@ -747,7 +766,7 @@ class Jogo():
                 if nome in carta.nome:
                     encontradas.append(carta)
         if self.missao_atual and nome in self.missao_atual.nome:
-            encontradas.append(carta)
+            encontradas.append(self.missao_atual)
         for encontrada in encontradas:
             print(encontrada)
 

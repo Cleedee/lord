@@ -80,7 +80,7 @@ CENARIOS_CONJUNTOS = {
     },
     'The Hunt for Gollum': {
         'conjuntos': [
-            'The Hunt For Gollum',
+            'The Hunt for Gollum',
             'Journey Down the Anduin',
             "Sauron's Reach",
         ],

@@ -15,6 +15,9 @@ def encontra_games() -> List[Game]:
 def encontra_carta_por_nome(nome: str) -> List[Card]:
     return Card.select().where(Card.name.contains(nome))
 
+def encontra_cartas_por_atributo(atributo: str) -> List[Card]:
+    return Card.select().where(Card.traits.contains(atributo))
+
 def encontra_decks():
     return Deck.select()
 

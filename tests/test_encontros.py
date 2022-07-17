@@ -7,7 +7,7 @@ def deck_de_missao():
     # http://lotrlcg.com/Scenario/Scenario/1001
 
     deck = lord.DeckDeMissao()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest'}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 'quest_points': 0}
     q1 = base.copy()
     q1['sequence'] = 1
     q2 = base.copy()

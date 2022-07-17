@@ -155,8 +155,10 @@ def deck_de_missao():
     staging area and make Bag End the active location. Shuffle the encounter
     deck.
     """
-    deck = lord.Baralho()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 'sequence': '1.0'}
+    deck = lord.DeckDeMissao()
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 
+        'sequence': '1.0', 'quest_points': 0
+    }
     missao = base.copy()
     missao['text'] = texto
     deck.nova_carta(lord.Mission('Three is Company', **missao))
@@ -313,4 +315,13 @@ def test_custo_da_carta(jogo_com_um_jogador, deck_para_abertura, herois):
 
 def test_primeiro_jogador(jogo_com_dois_jogadores):
     jogo = jogo_com_dois_jogadores
-    assert jogo.primeiro_jogador == None
+    assert jogo.jogador_inicial == None
+
+def test_definir_jogador_inicial_antes_de_comprar_mão_preparação(
+        jogo_com_dois_jogadores,
+        herois, deck_para_abertura):
+    jogo = jogo_com_dois_jogadores
+    jogo.jogador1.usar_decks(herois, deck_para_abertura)
+    jogo.jogador1.comprar_mão_inicial()
+    assert jogo.jogador_inicial == None
+    assert len(jogo.jogador1.mão) == 0

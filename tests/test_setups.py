@@ -18,7 +18,9 @@ def deck_de_missao_conflict_at_the_carrock():
     back into the encounter deck.
     """
     deck = lord.Baralho()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 'sequence': '1.0'}
+    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 
+        'sequence': '1.0', 'quest_points': 0
+    }
     missao = base.copy()
     missao['text'] = texto
     deck.nova_carta(lord.Mission("Grimbeorn's Quest", **missao))
@@ -61,6 +63,6 @@ def test_setup_conflict_at_the_carrock(jogo_com_um_jogador, deck_de_missao_confl
     jogo.area_de_ameaca.jogo = jogo
     jogo.deck_de_encontro.jogo = jogo
     jogo.fora_do_jogo.jogo = jogo
-    lord.collections.conflict_at_the_carrock(jogo)
+    lord.packs.conflict_at_the_carrock(jogo)
     assert jogo.area_de_ameaca.cartas[0].nome == 'The Carrock'
     assert len(jogo.fora_do_jogo.cartas) == 7
