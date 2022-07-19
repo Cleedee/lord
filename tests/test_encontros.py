@@ -59,3 +59,6 @@ def test_missao_atual(mocker, deck_de_missao, deck_de_encontro):
     jogo.enfrentar_cenario('Passage Through Mirkwood')
     jogo.setup()
     assert jogo.missao_atual.nome == 'Flies and Spiders'
+
+def test_objetivo_defendido():
+    jogo = lord.Jogo()

@@ -12,12 +12,12 @@ from lord import loader, utils
 from lord.packs import CENARIOS_CONJUNTOS
 
 class Carta():
-    def __init__(self, nome, **args):
+    def __init__(self, nome, text='', traits='', number=0, type_code='ally', **kwargs):
         self.nome = nome
-        self.texto =  utils.remover_tags(args['text']) if args['text'] else ''
-        self.atributos= args['traits'] if args['traits'] else ''
-        self.numero = args['number']
-        self.tipo = args['type_code']
+        self.texto =  utils.remover_tags(text) if text else ''
+        self.atributos= traits
+        self.numero = number
+        self.tipo = type_code
         self.virado = False
         self.anexos = []
 
@@ -28,9 +28,9 @@ class Carta():
         return self.nome
 
 class CartaJogador(Carta):
-    def __init__(self, nome, **args):
-        super().__init__(nome, **args)
-        self.esfera = args['sphere_code']
+    def __init__(self, nome, sphere_code='', **kwargs):
+        super().__init__(nome, **kwargs)
+        self.esfera = sphere_code
 
     @property
     def is_neutral(self):
@@ -58,13 +58,15 @@ class CartaJogador(Carta):
 
 
 class Hero(CartaJogador):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, threat=10, willpower=2, attack=1, 
+        defense=1, health=1,
+        **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo_ameaça = kwargs['threat']
-        self.força_vontade = kwargs['willpower']
-        self.ataque = kwargs['attack']
-        self.defesa = kwargs['defense']
-        self.pontos_vida = kwargs['health']
+        self.custo_ameaça = threat
+        self.força_vontade = willpower
+        self.ataque = attack
+        self.defesa = defense
+        self.pontos_vida = health
         self.recursos = 0
         self.dano = 0
 
@@ -86,9 +88,9 @@ class Hero(CartaJogador):
 
 class Acessorio(CartaJogador):
 
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, cost=1, **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo = kwargs['cost']
+        self.custo = cost
 
     def __str__(self):
 
@@ -104,13 +106,15 @@ class Acessorio(CartaJogador):
 
 class Aliado(CartaJogador):
 
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, cost=1, willpower=1, attack=1, defense=1,
+        health=1,
+        **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo = kwargs['cost']
-        self.força_vontade = kwargs['willpower']
-        self.ataque = kwargs['attack']
-        self.defesa = kwargs['defense']
-        self.pontos_vida = kwargs['health']
+        self.custo = cost
+        self.força_vontade = willpower
+        self.ataque = attack
+        self.defesa = defense
+        self.pontos_vida = health
         self.dano = 0
 
     def __str__(self):
@@ -128,9 +132,9 @@ class Aliado(CartaJogador):
 
 
 class Evento(CartaJogador):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, cost=1, **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo = kwargs['cost']
+        self.custo = cost
 
     def __str__(self):
         console = Console()
@@ -145,11 +149,11 @@ class Evento(CartaJogador):
 # Player Side Quest
 class MissaoParalela(CartaJogador):
 
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, cost=1, victory=0, quest=1, **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo = kwargs['cost']
-        self.vitoria = kwargs['victory'] if kwargs['victory'] else 0
-        self.pontos_missao = kwargs['quest'] if kwargs['quest'] else 0
+        self.custo = cost
+        self.vitoria = victory
+        self.pontos_missao = quest
 
     def __repr__(self):
         console = Console()
@@ -190,10 +194,10 @@ class CartaCenario(Carta):
         return True if self.tipo == 'objective_ally' else False
 
 class Mission(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, sequence='1', quest_points=1, **kwargs):
         super().__init__(nome, **kwargs)
-        self.sequencia = int(float(kwargs['sequence']))
-        self.pontos_missao = kwargs['quest_points']
+        self.sequencia = int(float(sequence))
+        self.pontos_missao = quest_points
 
     def __str__(self):
         console = Console()
@@ -206,13 +210,14 @@ class Mission(CartaCenario):
         return ''            
 
 class Localidade(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, threat='', quest_points='', victory='', encounter_set='',
+        shadow='', **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_ameaça = kwargs['threat']
-        self.pontos_missao = kwargs['quest_points']
-        self.vitoria = kwargs['victory'] if kwargs['victory'] else ''
-        self.conjunto_encontro = kwargs['encounter_set']
-        self.efeito_sombrio = kwargs['shadow']
+        self.força_ameaça = threat
+        self.pontos_missao = quest_points
+        self.vitoria = victory
+        self.conjunto_encontro = encounter_set
+        self.efeito_sombrio = shadow
 
     def __str__(self):
         console = Console()
@@ -234,10 +239,10 @@ class Localidade(CartaCenario):
     
 
 class Infortunio(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, encounter_set='', shadow='', **kwargs):
         super().__init__(nome, **kwargs)
-        self.conjunto_encontro = kwargs['encounter_set']
-        self.efeito_sombrio = kwargs['shadow']
+        self.conjunto_encontro = encounter_set
+        self.efeito_sombrio = shadow
 
     def __str__(self):
         console = Console()
@@ -253,10 +258,10 @@ class Infortunio(CartaCenario):
         return ''                    
 
 class Objetivo(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, encounter_set='', shadow='', **kwargs):
         super().__init__(nome, **kwargs)
-        self.conjunto_encontro = kwargs['encounter_set']
-        self.efeito_sombrio = kwargs['shadow']
+        self.conjunto_encontro = encounter_set
+        self.efeito_sombrio = shadow
 
     def __str__(self):
         console = Console()
@@ -269,25 +274,26 @@ class Objetivo(CartaCenario):
         return ''
 
 class ObjetivoAliado(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, willpower=0, attack=0, defense=0, health=1, **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_vontade = kwargs['willpower']
-        self.ataque = kwargs['attack']
-        self.defesa = kwargs['defense']
-        self.pontos_vida = kwargs['health']
+        self.força_vontade = willpower
+        self.ataque = attack
+        self.defesa = defense
+        self.pontos_vida = health
         self.dano = 0
 
 
 class Inimigo(CartaCenario):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, engage=20, threat=1, attack=1, defense=1,
+        health=1, encounter_set='', shadow='', **kwargs):
         super().__init__(nome, **kwargs)
-        self.custo_engajamento = kwargs['engage']
-        self.força_ameaça = int(kwargs['threat'])
-        self.ataque = kwargs['attack']
-        self.defesa = kwargs['defense']
-        self.pontos_vida = kwargs['health']
-        self.conjunto_encontro = kwargs['encounter_set']
-        self.efeito_sombrio = kwargs['shadow']
+        self.custo_engajamento = engage
+        self.força_ameaça = int(threat)
+        self.ataque = attack
+        self.defesa = defense
+        self.pontos_vida = health
+        self.conjunto_encontro = encounter_set
+        self.efeito_sombrio = shadow
         self.dano = 0
 
     def __str__(self):

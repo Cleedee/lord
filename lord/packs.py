@@ -17,7 +17,7 @@ def escape_from_dol_guldur(jogo):
     gandalf = jogo.deck_de_encontro.mover_para_area_de_ameaça("Gandalf's Map")
     dungeon = jogo.deck_de_encontro.mover_para_area_de_ameaça('Dungeon Torch')
     shadow = jogo.deck_de_encontro.mover_para_area_de_ameaça('Shadow Key')
-    nazgul = shadow = jogo.deck_de_encontro.mover_para_fora_do_jogo('Nazgûl of Dol Guldur')
+    jogo.deck_de_encontro.mover_para_fora_do_jogo('Nazgûl of Dol Guldur')
     carta1 = jogo.deck_de_encontro.comprar()
     gandalf.anexos.append(carta1)
     print(f"{carta1.nome} foi anexada a Gandalf's Map.")

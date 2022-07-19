@@ -17,134 +17,29 @@ def jogo_com_dois_jogadores():
 
 @pytest.fixture
 def deck_duas_cartas():
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'hero'}
-    balin = {
-        'threat': 9,
-        'willpower': 2,
-        'attack': 1,
-        'defense': 2,
-        'health': 4,
-        'sphere_code': 'leadership',
-    }
-    balin.update(base)
     deck = lord.Baralho()
-    deck.nova_carta(lord.Hero('Balin', **balin))
-    deck.nova_carta(lord.Carta('The One Ring', **base))
+    deck.nova_carta(lord.Hero('Balin'))
+    deck.nova_carta(lord.Carta('The One Ring'))
     return deck
 
 @pytest.fixture
 def deck_para_abertura():
     deck = lord.Baralho()
-    base = {'number': 0,'type_code':'hero'}
-    snowbourn = {
-        'text': """Response: After Snowbourn Scout enters play, choose a location. 
-            Place 1 progress token on that location.""",
-        'sphere_code': 'leadership',
-        'willpower': 0,
-        'attack': 0,
-        'defense': 1,
-        'health': 1,
-        'cost': 1,
-        'traits': 'Rohan. Scout.'
-    }
-    snowbourn.update(base)
-    windfola = {
-        'text': """
-            Attach to a spirit hero, or to Éowyn. Restricted.
-
-            Attached character gets +1 willpower.
-
-            Response: After attached character is removed from the quest, exhaust Windfola to 
-            commit attached hero to the quest.
-            """,
-        'sphere_code': 'spirit',
-        'traits': 'Mount.',
-        'cost': 1,
-    }
-    windfola.update(base)
-    rohan_warhorse = {
-        'text': """
-            Attach to a  or Rohan hero. Restricted.
-
-            Response: After attached hero participates in an attack that destroys an enemy, 
-            exhaust Rohan Warhorse to ready attached hero.
-            """,
-        'sphere_code':  'tactics',
-        'traits': 'Mount.',
-        'cost': 1
-    }
-    rohan_warhorse.update(base)
-    firefoot = {
-        'sphere_code': 'tactics',
-        'cost': 2,
-        'traits': 'Mount.',
-        'text': ''
-    }
-    firefoot.update(base)
-    westfold = {
-        'cost': 2,
-        'willpower': 0,
-        'attack': 2,
-        'defense': 1,
-        'health': 2,
-        'sphere_code': 'tactics',
-        'traits': 'Rohan. Scout.',
-        'text': ''
-    }
-    westfold.update(base)
-    armored = {
-        'sphere_code': 'leadership',
-        'cost': 2,
-        'traits': 'Mount.',
-        'text': ''
-    }
-    armored.update(base)
-    deck.nova_carta(lord.Aliado('Snowbourn Scout', **snowbourn))
-    deck.nova_carta(lord.Acessorio('Windfola', **windfola))
-    deck.nova_carta(lord.Acessorio('Rohan Warhorse', **rohan_warhorse))
-    deck.nova_carta(lord.Acessorio('Rohan Warhorse', **rohan_warhorse))
-    deck.nova_carta(lord.Acessorio('Firefoot', **firefoot))
-    deck.nova_carta(lord.Aliado('Westfold Outrider', **westfold))
-    deck.nova_carta(lord.Acessorio('Armored Destrier', **armored))
+    deck.nova_carta(lord.Aliado('Snowbourn Scout', cost=1))
+    deck.nova_carta(lord.Acessorio('Windfola'))
+    deck.nova_carta(lord.Acessorio('Rohan Warhorse'))
+    deck.nova_carta(lord.Acessorio('Rohan Warhorse'))
+    deck.nova_carta(lord.Acessorio('Firefoot', cost=2))
+    deck.nova_carta(lord.Aliado('Westfold Outrider'))
+    deck.nova_carta(lord.Acessorio('Armored Destrier'))
     return deck
 
 @pytest.fixture
 def herois():
-    base = {'number': 0, 'text': '', 'type_code': 'hero'}
-    elfhelm = {
-        'threat': 10,
-        'willpower': 2,
-        'attack': 2,
-        'defense': 2,
-        'health': 4,
-        'sphere_code': 'leadership',
-        'traits': 'Rohan. Scout. Warrior.'
-    }
-    elfhelm.update(base)
-    eomer = {
-        'threat': 10,
-        'willpower': 1,
-        'attack': 3,
-        'defense': 2,
-        'health': 4,
-        'sphere_code': 'leadership',
-        'traits': 'Rohan. Noble. Warrior.'
-    }
-    eomer.update(base)
-    eowyn = {
-        'threat': 9,
-        'willpower': 4,
-        'attack': 1,
-        'defense': 1,
-        'health': 3,
-        'sphere_code': 'spirit',
-        'traits': 'Noble. Rohan.'
-    }
-    eowyn.update(base)    
     deck = lord.Baralho()
-    deck.nova_carta(lord.Hero('Elfhelm', **elfhelm))
-    deck.nova_carta(lord.Hero('Éomer', **eomer))
-    deck.nova_carta(lord.Hero('Éowyn', **eowyn))
+    deck.nova_carta(lord.Hero('Elfhelm', sphere_code='leadership'))
+    deck.nova_carta(lord.Hero('Éomer', sphere_code='leadership'))
+    deck.nova_carta(lord.Hero('Éowyn', sphere_code='spirit', threat=9))
     return deck
 
 @pytest.fixture
@@ -156,36 +51,22 @@ def deck_de_missao():
     deck.
     """
     deck = lord.DeckDeMissao()
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'quest', 
-        'sequence': '1.0', 'quest_points': 0
-    }
-    missao = base.copy()
-    missao['text'] = texto
-    deck.nova_carta(lord.Mission('Three is Company', **missao))
-    deck.nova_carta(lord.Mission('A Shortcut to Mushrooms', **base))
-    deck.nova_carta(lord.Mission('Escape to Buckland', **base))
+    deck.nova_carta(lord.Mission('Three is Company', text=texto))
+    deck.nova_carta(lord.Mission('A Shortcut to Mushrooms'))
+    deck.nova_carta(lord.Mission('Escape to Buckland'))
     return deck
 
 @pytest.fixture
 def deck_de_encontro():
-    base = {'text':'', 'traits':'','number': 0, 'type_code': 'hero'}
-    bagend = {
-        'threat': 0,
-        'quest_points': 3,
-        'victory': '1',
-        'encounter_set': '',
-        'shadow': ''
-    }
-    bagend.update(base)
-    deck = lord.Baralho()
-    deck.nova_carta(lord.Carta('A Shadow of the Past', **base))
-    deck.nova_carta(lord.Carta('Bag End', **base))
-    deck.nova_carta(lord.Carta('Woody End', **base))
-    deck.nova_carta(lord.Carta('Stock-Brook', **base))
-    deck.nova_carta(lord.Carta('Pathless Country', **base))
-    deck.nova_carta(lord.Carta('Buckleberry Ferry', **base))
-    deck.nova_carta(lord.Carta('Black Rider', **base))
-    deck.nova_carta(lord.Localidade('Bag End', **bagend))
+    deck = lord.DeckEncontro()
+    deck.nova_carta(lord.Carta('A Shadow of the Past'))
+    deck.nova_carta(lord.Carta('Bag End'))
+    deck.nova_carta(lord.Carta('Woody End'))
+    deck.nova_carta(lord.Carta('Stock-Brook'))
+    deck.nova_carta(lord.Carta('Pathless Country'))
+    deck.nova_carta(lord.Carta('Buckleberry Ferry'))
+    deck.nova_carta(lord.Inimigo('Black Rider'))
+    deck.nova_carta(lord.Localidade('Bag End'))
     return deck
 
 
