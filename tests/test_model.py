@@ -88,7 +88,7 @@ def test_deck_de_2_cartas(jogo_com_um_jogador, deck_duas_cartas, herois):
 def test_sem_cartas_na_mao(jogo_com_um_jogador, deck_duas_cartas, herois):
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_duas_cartas)
-    assert len(jogo.jogador1.mão) == 0
+    assert jogo.jogador1.mão.total == 0
 
 def test_carta_virada(jogo_com_um_jogador, deck_duas_cartas, herois):
     jogo = jogo_com_um_jogador
@@ -102,7 +102,7 @@ def test_mão_inicial(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.embaralhar_deck()
     jogo.jogador1.comprar_mão_inicial()
     assert jogo.jogador1.herois_em_jogo.total == 3
-    assert len(jogo.jogador1.mão) == 6
+    assert jogo.jogador1.mão.total == 6
 
 def test_ameaça_inicial_é_29(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
@@ -126,7 +126,7 @@ def test_comprar_carta(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.embaralhar_deck()
     jogo.jogador1.comprar_mão_inicial()
     jogo.jogador1.comprar()
-    assert len(jogo.jogador1.mão) == 7
+    assert jogo.jogador1.mão.total == 7
 
 def test_jogar_carta_custo_1(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
@@ -136,7 +136,7 @@ def test_jogar_carta_custo_1(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo.jogador1.comprar()
     jogo.jogador1.jogar('Snowbourn Scout')
     jogo.jogador1.pagar_de('Elfhelm', 1)
-    assert len(jogo.jogador1.mão) == 6
+    assert jogo.jogador1.mão.total == 6
     assert jogo.jogador1.mesa.total == 1
     assert jogo.jogador1.mesa.cartas[0].virado == False
     assert jogo.jogador1.herois_em_jogo.cartas[0].recursos == 0
@@ -178,21 +178,21 @@ def test_ver_primeira_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, her
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     texto = 'Snowbourn Scout'
-    assert jogo.jogador1.mão[0].nome == texto
+    assert jogo.jogador1.mão.cartas[0].nome == texto
 
 def test_ver_segunda_carta_da_mão(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     texto = 'Windfola'
-    assert jogo.jogador1.mão[1].nome == texto
+    assert jogo.jogador1.mão.cartas[1].nome == texto
 
 def test_custo_da_carta(jogo_com_um_jogador, deck_para_abertura, herois):
     jogo = jogo_com_um_jogador
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
-    assert jogo.jogador1.hand[0].custo == 1 # Snowbourn Scout
-    assert jogo.jogador1.hand[4].custo == 2 # Firefoot
+    assert jogo.jogador1.hand.cartas[0].custo == 1 # Snowbourn Scout
+    assert jogo.jogador1.hand.cartas[4].custo == 2 # Firefoot
 
 def test_primeiro_jogador(jogo_com_dois_jogadores):
     jogo = jogo_com_dois_jogadores
@@ -205,4 +205,4 @@ def test_definir_jogador_inicial_antes_de_comprar_mão_preparação(
     jogo.jogador1.usar_decks(herois, deck_para_abertura)
     jogo.jogador1.comprar_mão_inicial()
     assert jogo.jogador_inicial == None
-    assert len(jogo.jogador1.mão) == 0
+    assert jogo.jogador1.mão.total == 0

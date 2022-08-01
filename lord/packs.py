@@ -2,8 +2,6 @@
 def passage_through_mirkwood(jogo):
     jogo.deck_de_encontro.mover_para_area_de_ameaça('Forest Spider')
     jogo.deck_de_encontro.mover_para_area_de_ameaça('Old Forest Road')
-    print('Forest Spider foi colocado na área de ameaça.')
-    print('Old Forest Road foi colocado na área de ameaça.')
     print('Setup concluído.')
 
 def journey_down_the_anduin(jogo):
@@ -51,6 +49,15 @@ def conflict_at_the_carrock(jogo):
     jogo.deck_de_encontro.embaralhar()
     print('Setup concluido.')
 
+def the_redhorn_gate(jogo):
+    jogo.deck_de_encontro.mover_para_area_de_ameaça('Caradhras')
+    for _ in range(5):
+        jogo.deck_de_encontro.mover_para_fora_do_jogo('Snowstorm')
+    arwen = jogo.deck_de_encontro.retirar('Arwen Undómiel')
+    jogo.jogador_inicial.mesa.nova_carta(arwen)
+    print('Arwen Undómiel foi colocada na mesa do jogador inicial.')
+    print('Setup concluído.')
+
 CENARIOS_CONJUNTOS = {
     'Passage Through Mirkwood' : {
         'conjuntos':
@@ -93,5 +100,12 @@ CENARIOS_CONJUNTOS = {
             "Wilderlands",
         ],
         'setup': conflict_at_the_carrock
+    },
+    'The Redhorn Gate': {
+        'conjuntos': [
+            'The Redhorn Gate',
+            'Misty Mountains'
+        ],
+        'setup': the_redhorn_gate
     }
 }

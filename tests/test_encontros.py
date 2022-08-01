@@ -24,33 +24,17 @@ def deck_de_missao():
 
 @pytest.fixture
 def deck_de_encontro():
-    base = {
-        'text':'',
-        'traits':'',
-        'number': 0,
-        'type_code':'hero',
-        'encounter_set': 'Conflict at the Carrock',
-        'shadow': '',
-        'engage': '',
-        'threat': '0',
-        'attack': '0',
-        'defense': '0',
-        'health': '0',
-        'quest_points': '0',
-        'victory': '0'
-    }
-    location_fake = {
-        'threat': 0,
-        'quest_points': 3,
-        'victory': '1',
-        'encounter_set': '',
-        'shadow': ''
-    }
-    location_fake.update(base)    
     deck = lord.DeckEncontro()
-    deck.nova_carta(lord.Inimigo('Forest Spider', **base))
-    deck.nova_carta(lord.Localidade('Old Forest Road', **location_fake))
+    deck.nova_carta(lord.Inimigo('Forest Spider'))
+    deck.nova_carta(lord.Localidade('Old Forest Road'))
     return deck
+
+@pytest.fixture
+def cartas_test_objetivo():
+    return [
+        lord.Objetivo('Signs of Gollum', traits='Guarded.'),
+        lord.Localidade('The East Bank')
+    ]
 
 def test_missao_atual(mocker, deck_de_missao, deck_de_encontro):
     jogo = lord.Jogo()
@@ -60,5 +44,17 @@ def test_missao_atual(mocker, deck_de_missao, deck_de_encontro):
     jogo.setup()
     assert jogo.missao_atual.nome == 'Flies and Spiders'
 
-def test_objetivo_defendido():
+def test_objetivo_defendido(mocker, deck_de_missao, deck_de_encontro, cartas_test_objetivo):
     jogo = lord.Jogo()
+    mock_carregar_deck_cenario = mocker.patch('lord.loader.carregar_deck_cenario')
+    mock_carregar_deck_cenario.return_value = (deck_de_missao, deck_de_encontro)
+    jogo.enfrentar_cenario('Passage Through Mirkwood')
+    jogo.setup()
+    jogo.deck_de_encontro.cartas.extend(cartas_test_objetivo)
+    objetivo = jogo.comprar()
+    assert objetivo.defendido == False
+    assert objetivo.tem_atributo_defendido == True
+    jogo.comprar()
+    assert jogo.area_de_ameaca.cartas[2].nome == 'Signs of Gollum'
+    assert jogo.area_de_ameaca.cartas[3].nome == 'The East Bank'
+    assert objetivo.defendido == True

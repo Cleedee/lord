@@ -12,12 +12,12 @@ from lord import loader, utils
 from lord.packs import CENARIOS_CONJUNTOS
 
 class Carta():
-    def __init__(self, nome, text='', traits='', number=0, type_code='ally', **kwargs):
+    def __init__(self, nome, text='', traits='', number=0, **kwargs):
         self.nome = nome
         self.texto =  utils.remover_tags(text) if text else ''
         self.atributos= traits
         self.numero = number
-        self.tipo = type_code
+        self.tipo = 'Carta'
         self.virado = False
         self.anexos = []
 
@@ -69,6 +69,7 @@ class Hero(CartaJogador):
         self.pontos_vida = health
         self.recursos = 0
         self.dano = 0
+        self.tipo = 'Herói'
 
     def adicionar_recurso(self):
         self.recursos += 1
@@ -91,6 +92,7 @@ class Acessorio(CartaJogador):
     def __init__(self, nome, cost=1, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo = cost
+        self.tipo = 'Acessório'
 
     def __str__(self):
 
@@ -116,6 +118,7 @@ class Aliado(CartaJogador):
         self.defesa = defense
         self.pontos_vida = health
         self.dano = 0
+        self.tipo = 'Aliado'
 
     def __str__(self):
         console = Console()
@@ -135,6 +138,7 @@ class Evento(CartaJogador):
     def __init__(self, nome, cost=1, **kwargs):
         super().__init__(nome, **kwargs)
         self.custo = cost
+        self.tipo = 'Evento'
 
     def __str__(self):
         console = Console()
@@ -154,8 +158,9 @@ class MissaoParalela(CartaJogador):
         self.custo = cost
         self.vitoria = victory
         self.pontos_missao = quest
+        self.tipo = 'Missão Paralela'
 
-    def __repr__(self):
+    def __str__(self):
         console = Console()
         table = Table(show_header=False, show_lines=True)
         table.add_row(f'[bold]Nome:[/] {self.nome} ({self.custo}) {self.tipo}')
@@ -169,9 +174,9 @@ class MissaoParalela(CartaJogador):
 
 
 class CartaCenario(Carta):
-    def __init__(self, nome, **kwargs):
+    def __init__(self, nome, threat='0', **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_ameaça = 0
+        self.força_ameaça = threat
 
     @property
     def is_location(self):
@@ -198,6 +203,7 @@ class Mission(CartaCenario):
         super().__init__(nome, **kwargs)
         self.sequencia = int(float(sequence))
         self.pontos_missao = quest_points
+        self.tipo = 'Missão'
 
     def __str__(self):
         console = Console()
@@ -210,14 +216,14 @@ class Mission(CartaCenario):
         return ''            
 
 class Localidade(CartaCenario):
-    def __init__(self, nome, threat='', quest_points='', victory='', encounter_set='',
+    def __init__(self, nome, quest_points='', victory='', encounter_set='',
         shadow='', **kwargs):
         super().__init__(nome, **kwargs)
-        self.força_ameaça = threat
         self.pontos_missao = quest_points
         self.vitoria = victory
         self.conjunto_encontro = encounter_set
         self.efeito_sombrio = shadow
+        self.tipo = 'Localidade'
 
     def __str__(self):
         console = Console()
@@ -243,6 +249,7 @@ class Infortunio(CartaCenario):
         super().__init__(nome, **kwargs)
         self.conjunto_encontro = encounter_set
         self.efeito_sombrio = shadow
+        self.tipo = 'Infortúnio'
 
     def __str__(self):
         console = Console()
@@ -262,6 +269,12 @@ class Objetivo(CartaCenario):
         super().__init__(nome, **kwargs)
         self.conjunto_encontro = encounter_set
         self.efeito_sombrio = shadow
+        self.defendido = False
+        self.tipo = 'Objetivo'
+
+    @property
+    def tem_atributo_defendido(self):
+        return True if 'Guarded' in self.atributos else False
 
     def __str__(self):
         console = Console()
@@ -281,20 +294,37 @@ class ObjetivoAliado(CartaCenario):
         self.defesa = defense
         self.pontos_vida = health
         self.dano = 0
+        self.tipo = 'Objetivo-Aliado'
+
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]{self.nome}[/] ({self.tipo})')
+
+        texto = ''
+        texto += f'FA: {self.força_ameaça} A: {self.ataque} D: {self.defesa} PV: {self.pontos_vida}\n'
+        texto += f'[bold]Dano:[/] {self.dano}\n'
+        texto += f'[bold]Atributos:[/] {self.atributos}'
+
+        table.add_row(texto)
+
+        table.add_row(f'{escape(self.texto)}')
+        console.print(table)
+        return ''
 
 
 class Inimigo(CartaCenario):
-    def __init__(self, nome, engage=20, threat=1, attack=1, defense=1,
+    def __init__(self, nome, engage=20, attack=1, defense=1,
         health=1, encounter_set='', shadow='', **kwargs):
         super().__init__(nome, **kwargs)
         self.custo_engajamento = engage
-        self.força_ameaça = int(threat)
         self.ataque = attack
         self.defesa = defense
         self.pontos_vida = health
         self.conjunto_encontro = encounter_set
         self.efeito_sombrio = shadow
         self.dano = 0
+        self.tipo = 'Inimigo'
 
     def __str__(self):
         console = Console()
@@ -341,7 +371,7 @@ class Baralho():
         return [carta for carta in self.cartas if carta.nome == nome]
 
     def comprar(self):
-        return self.cartas.pop()
+        return self.cartas.pop(0)
 
 class Area(Baralho):
     def __init__(self):
@@ -352,6 +382,11 @@ class Area(Baralho):
         for carta in self.cartas:
             repr += f'{carta.nome}\n'
         return repr
+
+    @property
+    def ver(self):
+        for carta in self.cartas:
+            print(carta)
 
 class AreaAmeaça(Area):
     def __init__(self, jogo=None):
@@ -408,13 +443,25 @@ class ForaDoJogo(Area):
         print(f'{nome} foi colocada na área de ameaça.')
         return self.jogo.mover_carta(nome, Jogo.FORA_DO_JOGO, Jogo.DECK_DE_ENCONTRO)
 
-class Mão(UserList):
-    def index(self, valor):
-        for count, value in enumerate(self.data):
-            if value.nome == valor:
-                return count
-        else:
-            raise ValueError
+# class Mão(UserList):
+#     def index(self, valor):
+#         for count, value in enumerate(self.data):
+#             if value.nome == valor:
+#                 return count
+#         else:
+#             raise ValueError
+
+class Mão(Area):
+    
+    def __init__(self, jogador=None):
+        super().__init__()
+        self.jogador = jogador
+
+    def mover_para_mesa(self, nome):
+        carta = self.retirar(nome)
+        print(f'{nome} foi adicionada à área do jogador.')
+        self.jogador.mesa.nova_carta(carta)
+
 
 class Jogador():
     def __init__(self, nome = 'Jogador 1'):
@@ -422,7 +469,7 @@ class Jogador():
         self.deck_de_jogador = None
         self.deck_de_herois = None
         # espaço de jogo
-        self.hand = Mão()
+        self.hand = Mão(jogador=self)
         self.deck_de_compra = None
         self.deck_de_descarte = None
         self.descarte = Baralho()
@@ -526,17 +573,17 @@ class Jogador():
 
     def comprar_mão_inicial(self):
         if self.jogo.jogador_inicial:
-            self.hand = Mão(self.deck_de_compra.cartas[0:6])
+            self.hand.cartas = self.deck_de_compra.cartas[0:6]
             self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
         elif len(self.jogo.jogadores) == 1:
             self.jogo.jogador_inicial = self
-            self.hand = Mão(self.deck_de_compra.cartas[0:6])
+            self.hand.cartas = self.deck_de_compra.cartas[0:6]
             self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
         else:
             print('Antes, determine o jogador inicial.')
 
     def comprar(self):
-        self.hand.extend(self.deck_de_compra.cartas[0:1])
+        self.hand.cartas.extend(self.deck_de_compra.cartas[0:1])
         self.deck_de_compra.cartas = self.deck_de_compra.cartas[1:]
 
     def adicionar_recursos(self):
@@ -544,11 +591,7 @@ class Jogador():
             heroi.adicionar_recurso()
 
     def jogar(self, nome_carta):
-        pos = self.hand.index(nome_carta)
-        carta = self.hand.pop(pos)
-        if not carta:
-            raise Exception
-        self.mesa.nova_carta( carta )
+        self.hand.mover_para_mesa(nome_carta)
 
     def pagar_de(self, heroi, quantidade):
         for count, value in enumerate( self.herois_em_jogo.cartas):
@@ -646,7 +689,7 @@ class Jogo():
     def força_ameaça(self):
         total = 0
         for carta in self.area_de_ameaca.cartas:
-            total += int(carta.força_ameaça) if carta.força_ameaça.isdigit() else 0
+            total += int(carta.força_ameaça) if str(carta.força_ameaça).isdigit() else 0
             for anexo in carta.anexos:
                 total += anexo.força_ameaça
         return total
@@ -720,7 +763,7 @@ class Jogo():
     def comprar(self):
         carta = self.deck_de_encontro.comprar()
         self.area_de_ameaca.cartas.append(carta)
-        print(f'{carta.nome} foi adicionada à Área de Ameaça.')
+        print(carta)
         if carta.is_treachery:
             print(f'{carta.nome} é um infortúnio. Resolva.')
         return carta
@@ -768,7 +811,7 @@ class Jogo():
             for carta in jogador.mesa.cartas:
                 if nome in carta.nome:
                     encontradas.append(carta)
-            for carta in jogador.mão:
+            for carta in jogador.mão.cartas:
                 if nome in carta.nome:
                     encontradas.append(carta)
         if self.missao_atual and nome in self.missao_atual.nome:
