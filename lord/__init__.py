@@ -581,6 +581,7 @@ class Jogador():
             self.deck_de_compra.cartas = self.deck_de_compra.cartas[6:]
         else:
             print('Antes, determine o jogador inicial.')
+            print('Exemplo: jogo.jogador_inicial = nome_jogador')
 
     def comprar(self):
         self.hand.cartas.extend(self.deck_de_compra.cartas[0:1])
