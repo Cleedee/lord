@@ -75,8 +75,10 @@ def pegar_classe_da_carta_jogador(carta: Card):
         return lord.Acessorio
     elif carta.type_code == 'player-side-quest':
         return lord.MissaoParalela
+    elif carta.type_code == 'contract':
+        return lord.Contrato
     else:
-        raise Exception("Esse carta não é de jogador ou não configurada ");
+        raise Exception(f"{carta.name} não é de jogador ou não configurada (tipo: {carta.type_code}) ");
 
 def carta_cenario_para_dicionario(card: Scenario) -> dict:
     return {

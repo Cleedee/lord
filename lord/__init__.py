@@ -172,6 +172,15 @@ class MissaoParalela(CartaJogador):
         console.print(table)
         return ''
 
+class Contrato(CartaJogador):
+    
+    def __init__(self, nome, **kwargs):
+        super().__init__(nome, **kwargs)
+    
+    def __str__(self):
+        console = Console()
+        table = Table(show_header=False, show_lines=True)
+        table.add_row(f'[bold]Nome:[/] {self.nome} {self.tipo}')
 
 class CartaCenario(Carta):
     def __init__(self, nome, threat='0', **kwargs):
