@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lord"
-version = "0.1.0"
+version = "0.2.0"
 description = "Application to play LOTR LCG"
 authors = ["Claudio Torcato <claudiotorcato@gmail.com>"]
 readme = "README.md"

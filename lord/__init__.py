@@ -460,16 +460,6 @@ class ForaDoJogo(Area):
 #         else:
 #             raise ValueError
 
-class Mão(Area):
-    
-    def __init__(self, jogador=None):
-        super().__init__()
-        self.jogador = jogador
-
-    def mover_para_mesa(self, nome):
-        carta = self.retirar(nome)
-        print(f'{nome} foi adicionada à área do jogador.')
-        self.jogador.mesa.nova_carta(carta)
 
 
 class Jogador():
@@ -641,6 +631,17 @@ class Jogador():
         console.print(table)
         return ''
 
+
+class Mão(Area):
+    
+    def __init__(self, jogador:(Jogador|None)=None):
+        super().__init__()
+        self.jogador = jogador
+
+    def mover_para_mesa(self, nome):
+        carta = self.retirar(nome)
+        print(f'{nome} foi adicionada à área do jogador.')
+        self.jogador.mesa.nova_carta(carta)
 
 class Jogo():
     DECK_DE_ENCONTRO = 'DECK_DE_ENCONTRO'
