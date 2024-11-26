@@ -5,7 +5,7 @@ def passage_through_mirkwood(jogo):
     print('Setup concluído.')
 
 def journey_down_the_anduin(jogo):
-    for jogador in jogo.jogadores:
+    for _ in jogo.jogadores:
         carta = jogo.deck_de_encontro.comprar()
         print(f'{carta.nome} colocada na área de ameaça.')
         jogo.area_de_ameaca.cartas.append(carta)
@@ -28,7 +28,7 @@ def escape_from_dol_guldur(jogo):
     print('setup concluido.')
 
 def the_hunt_for_gollum(jogo):
-    for jogador in jogo.jogadores:
+    for _ in jogo.jogadores:
         carta = jogo.deck_de_encontro.comprar()
         print(f'{carta.nome} colocada na área de ameaça.')
         jogo.area_de_ameaca.cartas.append(carta)
@@ -44,7 +44,7 @@ def conflict_at_the_carrock(jogo):
     jogo.deck_de_encontro.mover_para_fora_do_jogo('Louis')
     jogo.deck_de_encontro.mover_para_fora_do_jogo('Rupert')
     jogo.deck_de_encontro.mover_para_fora_do_jogo('Stuart')
-    for jogador in jogo.jogadores:
+    for _ in jogo.jogadores:
         jogo.fora_do_jogo.mover_para_deck_de_encontro('Sacked!')
     jogo.deck_de_encontro.embaralhar()
     print('Setup concluido.')

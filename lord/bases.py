@@ -1,5 +1,11 @@
 from abc import ABC, abstractmethod
 
+class Observador(ABC):
+
+    @abstractmethod
+    def atualizar(self) -> None:
+        pass
+
 class Sujeito(ABC):
 
     @abstractmethod
@@ -14,8 +20,3 @@ class Sujeito(ABC):
     def notificar(self) -> None:
         pass
 
-class Observador(ABC):
-
-    @abstractmethod
-    def update(self, sujeito: Sujeito) -> None:
-        pass

@@ -206,6 +206,10 @@ class CartaCenario(Carta):
     @property
     def is_objective_ally(self):
         return True if self.tipo == 'objective_ally' else False
+    
+    @property
+    def tem_atributo_defendido(self):
+        return True if 'Guarded' in self.atributos else False
 
 class Mission(CartaCenario):
     def __init__(self, nome, sequence='1', quest_points=1, **kwargs):
@@ -280,10 +284,7 @@ class Objetivo(CartaCenario):
         self.efeito_sombrio = shadow
         self.defendido = False
         self.tipo = 'Objetivo'
-
-    @property
-    def tem_atributo_defendido(self):
-        return True if 'Guarded' in self.atributos else False
+        self.guarda: (CartaCenario | None) = None # carta que guarda a mesma 
 
     def __str__(self):
         console = Console()
@@ -356,7 +357,7 @@ class Inimigo(CartaCenario):
 
 class Baralho():
     def __init__(self):
-        self.cartas = []
+        self.cartas: list[Carta] = []
 
     def __repr__(self):
         if len(self.cartas) > 10:
@@ -398,9 +399,19 @@ class Area(Baralho):
             print(carta)
 
 class AreaAmeaça(Area):
-    def __init__(self, jogo=None):
+    def __init__(self, jogo = None):
         super().__init__()
         self.jogo = jogo
+        self.cartas: list[CartaCenario] = []
+        self.cartas_guarda: list[Objetivo] = []
+
+    def ameaça_total(self):
+        total = 0
+        for carta in self.cartas:
+            total += int(carta.força_ameaça) if str(carta.força_ameaça).isdigit() else 0
+            for anexo in carta.anexos:
+                total += anexo.força_ameaça
+        return total
 
     def mover_para_localizacao_ativa(self, nome):
         print(f'{nome} agora é a localização ativa.')
@@ -409,6 +420,25 @@ class AreaAmeaça(Area):
     def mover_para_descarte(self, nome):
         print(f'{nome} foi descartada.')
         return self.jogo.mover_carta(nome, Jogo.AREA_DE_AMEACA,Jogo.DESCARTE_ENCONTRO)
+
+    def nova_carta(self, carta: CartaCenario):
+        if carta.is_objective:
+            if carta.tem_atributo_defendido:
+                print('atributo defendido')
+                self.cartas_guarda.append(carta)
+        if carta.is_enemy or carta.is_location:
+            # verificar se tem carta com atributo defendido
+            print('is_enemy or is_location')
+            if self.cartas_guarda:
+                print('guardando')
+                self.guardar(carta)
+        super().nova_carta(carta)
+
+    def guardar(self, carta: CartaCenario):
+        for c in self.cartas:
+            if c.tem_atributo_defendido and not c.guarda:
+                c.guarda = carta
+                c.defendido = True
 
 class DeckEncontro(Baralho):
     def __init__(self, jogo=None):
@@ -698,12 +728,7 @@ class Jogo():
 
     @property
     def força_ameaça(self):
-        total = 0
-        for carta in self.area_de_ameaca.cartas:
-            total += int(carta.força_ameaça) if str(carta.força_ameaça).isdigit() else 0
-            for anexo in carta.anexos:
-                total += anexo.força_ameaça
-        return total
+        return self.area_de_ameaca.ameaça_total()
 
     @property
     def deck_de_missao(self):
@@ -773,7 +798,7 @@ class Jogo():
 
     def comprar(self):
         carta = self.deck_de_encontro.comprar()
-        self.area_de_ameaca.cartas.append(carta)
+        self.area_de_ameaca.nova_carta(carta)
         print(carta)
         if carta.is_treachery:
             print(f'{carta.nome} é um infortúnio. Resolva.')

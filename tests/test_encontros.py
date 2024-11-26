@@ -25,8 +25,8 @@ def deck_de_missao():
 @pytest.fixture
 def deck_de_encontro():
     deck = lord.DeckEncontro()
-    deck.nova_carta(lord.Inimigo('Forest Spider'))
-    deck.nova_carta(lord.Localidade('Old Forest Road'))
+    deck.nova_carta(lord.Inimigo('Forest Spider', threat = 1))
+    deck.nova_carta(lord.Localidade('Old Forest Road', threat = 2))
     return deck
 
 @pytest.fixture
@@ -43,6 +43,8 @@ def test_missao_atual(mocker, deck_de_missao, deck_de_encontro):
     jogo.enfrentar_cenario('Passage Through Mirkwood')
     jogo.setup()
     assert jogo.missao_atual.nome == 'Flies and Spiders'
+    assert jogo.força_ameaça == 3
+    assert len(jogo.area_de_ameaca.cartas)
 
 def test_objetivo_defendido(mocker, deck_de_missao, deck_de_encontro, cartas_test_objetivo):
     jogo = lord.Jogo()
