@@ -7,19 +7,19 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-requests = "^2.31.0"
-beautifulsoup4 = "^4.12.2"
-peewee = "^3.17.8"
-xlrd = "^2.0.1"
-rich = "^13.4.1"
+requests = "^2.32.5"
+beautifulsoup4 = "^4.14.3"
+peewee = "^3.19.0"
+xlrd = "^2.0.2"
+rich = "^14.3.2"
 pyjsonq = "^1.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.3.1"
+pytest = "^9.0.2"
 peewee-moves = "^2.1.0"
-jupyterlab = "^4.3.1"
-pytest-mock = "^3.11.1"
+jupyterlab = "^4.5.4"
+pytest-mock = "^3.15.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Não Publicado]
 - Implementar o padrão Observador para a carta de objetivo saber que está defendida/guardada.
 
+## 0.3.0
+### Alterado
+- Atualizarção de bibliotecas
+
 ## 0.2.0 [2023-06-10]
 ### Adicionado
 - Mostrar novamente as informações de abertura.
