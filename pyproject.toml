@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lord"
-version = "0.2.0"
+version = "0.3.0"
 description = "Jogar Lord of the Rings: LGC no console interativo do Python"
 authors = ["Claudio Torcato <claudiotorcato@gmail.com>"]
 readme = "README.md"
