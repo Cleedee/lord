@@ -1,6 +1,8 @@
+from enum import Enum, auto
 import random
 from functools import reduce
 from collections import UserList
+from typing import List
 from urllib.parse import urlparse
 
 from rich.console import Console
@@ -177,7 +179,7 @@ class Contrato(CartaJogador):
     def __init__(self, nome, **kwargs):
         super().__init__(nome, **kwargs)
     
-    def __str__(self):
+    def __repr__(self):
         console = Console()
         table = Table(show_header=False, show_lines=True)
         table.add_row(f'[bold]Nome:[/] {self.nome} {self.tipo}')
@@ -189,23 +191,23 @@ class CartaCenario(Carta):
 
     @property
     def is_location(self):
-        return True if self.tipo == 'location' else False
+        return True if self.tipo == 'Localidade' else False
 
     @property
     def is_enemy(self):
-        return True if self.tipo == 'enemy' else False
+        return True if self.tipo == 'Inimigo' else False
 
     @property
     def is_treachery(self):
-        return True if self.tipo == 'treachery' else False
+        return True if self.tipo == 'Infortúnio' else False
 
     @property
     def is_objective(self):
-        return True if self.tipo == 'objective' else False
+        return True if self.tipo == 'Objetivo' else False
 
     @property
     def is_objective_ally(self):
-        return True if self.tipo == 'objective_ally' else False
+        return True if self.tipo == 'Objetivo-Aliado' else False
     
     @property
     def tem_atributo_defendido(self):
@@ -285,6 +287,20 @@ class Objetivo(CartaCenario):
         self.defendido = False
         self.tipo = 'Objetivo'
         self.guarda: (CartaCenario | None) = None # carta que guarda a mesma 
+        self.on_funcao_liberacao = None
+
+    def set_efeito_liberacao(self, funcao_efeito):
+        """Define o que acontece quando a carta é liberada."""
+        self.on_funcao_liberacao = funcao_efeito
+
+    def liberar(self, estado_jogo):
+        self.defendido = False
+        self.guarda = None
+        print(f"--- {self.nome} foi liberada! ---")
+
+        # se houver um efeito programado, execute-o
+        if self.on_funcao_liberacao:
+            self.on_funcao_liberacao(self, estado_jogo)
 
     def __str__(self):
         console = Console()
@@ -335,6 +351,7 @@ class Inimigo(CartaCenario):
         self.efeito_sombrio = shadow
         self.dano = 0
         self.tipo = 'Inimigo'
+        self.defendendo: (CartaCenario | None) = None
 
     def __str__(self):
         console = Console()
@@ -402,8 +419,8 @@ class AreaAmeaça(Area):
     def __init__(self, jogo = None):
         super().__init__()
         self.jogo = jogo
-        self.cartas: list[CartaCenario] = []
-        self.cartas_guarda: list[Objetivo] = []
+        self.cartas: List[Carta] = []
+        self.cartas_guarda: List[Objetivo] = []
 
     def ameaça_total(self):
         total = 0
@@ -439,6 +456,13 @@ class AreaAmeaça(Area):
             if c.tem_atributo_defendido and not c.guarda:
                 c.guarda = carta
                 c.defendido = True
+
+    def processar_derrota(self, inimigo: Inimigo):
+        """Chamado sempre que um inimigo morre na mesa."""
+        if inimigo.guardando:
+            obj = inimigo.guardando
+            obj.defendido = False
+            obj.guarda = None
 
 class DeckEncontro(Baralho):
     def __init__(self, jogo=None):
@@ -504,7 +528,7 @@ class Jogador():
         self.descarte = Baralho()
         self.herois_em_jogo = Area()
         self.mesa = Area()
-        self.jogo: Jogo = None
+        self.jogo: (Jogo | None) = None
         self.total_ameaça = 0
 
     def usar_decks(self, deck_de_herois, deck_de_jogador):
@@ -554,44 +578,45 @@ class Jogador():
         return self.hand
 
     def _posicao_na_mao(self, posicao):
-        carta = self.hand[posicao - 1]
+        carta = self.hand.cartas[posicao - 1]
         print(carta)
+        return carta
 
     @property
     def h1(self):
-        self._posicao_na_mao(1)
+        return self._posicao_na_mao(1)
 
     @property
     def h2(self):
-        self._posicao_na_mao(2)
+        return self._posicao_na_mao(2)
 
     @property
     def h3(self):
-        self._posicao_na_mao(3)
+        return self._posicao_na_mao(3)
 
     @property
     def h4(self):
-        self._posicao_na_mao(4)
+        return self._posicao_na_mao(4)
 
     @property
     def h5(self):
-        self._posicao_na_mao(5)
+        return self._posicao_na_mao(5)
 
     @property
     def h6(self):
-        self._posicao_na_mao(6)
+        return self._posicao_na_mao(6)
 
     @property
     def h7(self):
-        self._posicao_na_mao(7)
+        return self._posicao_na_mao(7)
 
     @property
     def hfim(self):
-        quantidade = len(self.hand)
-        self._posicao_na_mao(quantidade)
+        quantidade = len(self.hand.cartas)
+        return self._posicao_na_mao(quantidade)
 
     def h(self, posicao):
-        self._posicao_na_mao(posicao)
+        return self._posicao_na_mao(posicao)
 
     @property
     def ameaça_inicial(self):
@@ -673,6 +698,7 @@ class Mão(Area):
         print(f'{nome} foi adicionada à área do jogador.')
         self.jogador.mesa.nova_carta(carta)
 
+
 class Jogo():
     DECK_DE_ENCONTRO = 'DECK_DE_ENCONTRO'
     DECK_DE_MISSAO = 'DECK_DE_MISSAO'
@@ -693,6 +719,7 @@ class Jogo():
             Jogo.LOCALIZACAO_ATIVA : Area()
         }
         self.jogador_inicial = None
+        self.jogador_atual = None
         self.missao_atual = None
         self.colecao = colecao
         
