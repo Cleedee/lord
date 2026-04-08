@@ -14,6 +14,7 @@ xlrd = "^2.0.2"
 rich = "^14.3.2"
 pyjsonq = "^1.0.2"
 tornado = "6.5.5"
+pygments = "^2.20.0"
 
 
 [tool.poetry.group.dev.dependencies]
