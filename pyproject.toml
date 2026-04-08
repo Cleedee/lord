@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-requests = "^2.32.5"
+requests = "^2.33.1"
 beautifulsoup4 = "^4.14.3"
 peewee = "^3.19.0"
 xlrd = "^2.0.2"
@@ -19,7 +19,6 @@ tornado = "6.5.5"
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
 peewee-moves = "^2.1.0"
-jupyterlab = "^4.5.4"
 pytest-mock = "^3.15.1"
 
 [build-system]
